@@ -25,14 +25,25 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .csrf().disable()
-            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            .and()
-            .authorizeRequests()
-            .antMatchers("/auth/**", "/hello-servlet", "/swagger-ui/**", 
-                       "/v3/api-docs/**", "/swagger-resources/**").permitAll()
-            .anyRequest().authenticated()
-            .and()
+            .csrf(csrf -> csrf.disable())
+            .sessionManagement(session -> session
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            )
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers(
+                    "/auth/**", 
+                    "/hello-servlet", 
+                    "/swagger-ui/**", 
+                    "/v3/api-docs/**", 
+                    "/swagger-resources/**",
+                    "/webjars/**",
+                    "/swagger-ui.html",
+                    "/",
+                    "/error",
+                    "/favicon.ico"
+                ).permitAll()
+                .anyRequest().authenticated()
+            )
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
