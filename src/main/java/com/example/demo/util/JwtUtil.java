@@ -17,7 +17,7 @@ public class JwtUtil {
     @Value("${jwt.secret}")
     private String secret;
     
-    @Value("${jwt.expiration}")
+    @Value("${jwt.expiration:3600000}") // Default: 1 hour
     private Long expiration;
     
     private SecretKey getSigningKey() {
@@ -33,20 +33,20 @@ public class JwtUtil {
     
     private String createToken(Map<String, Object> claims, String subject) {
         return Jwts.builder()
-                .setClaims(claims)
-                .setSubject(subject)
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + expiration))
-                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
+                .claims(claims)  // Changed from setClaims()
+                .subject(subject) // Changed from setSubject()
+                .issuedAt(new Date(System.currentTimeMillis())) // Changed from setIssuedAt()
+                .expiration(new Date(System.currentTimeMillis() + expiration)) // Changed from setExpiration()
+                .signWith(getSigningKey(), Jwts.SIG.HS256) // Changed signature
                 .compact();
     }
     
     public Boolean validateToken(String token) {
         try {
-            Jwts.parserBuilder()
-                .setSigningKey(getSigningKey())
+            Jwts.parser()
+                .verifyWith(getSigningKey())
                 .build()
-                .parseClaimsJws(token);
+                .parseSignedClaims(token);
             return true;
         } catch (JwtException | IllegalArgumentException e) {
             return false;
@@ -73,10 +73,23 @@ public class JwtUtil {
     }
     
     private Claims extractAllClaims(String token) {
-        return Jwts.parserBuilder()
-                .setSigningKey(getSigningKey())
+        return Jwts.parser()
+                .verifyWith(getSigningKey())
                 .build()
-                .parseClaimsJws(token)
-                .getBody();
+                .parseSignedClaims(token)
+                .getPayload();
+    }
+    
+    // Additional helper methods
+    public Date extractExpiration(String token) {
+        return extractClaim(token, Claims::getExpiration);
+    }
+    
+    public Boolean isTokenExpired(String token) {
+        return extractExpiration(token).before(new Date());
+    }
+    
+    public String extractIssuer(String token) {
+        return extractClaim(token, Claims::getIssuer);
     }
 }
