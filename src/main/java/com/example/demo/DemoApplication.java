@@ -1,6 +1,5 @@
 package com.example.demo;
 
-import com.example.demo.servlet.SimpleHelloServlet;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
@@ -13,7 +12,10 @@ public class DemoApplication {
     }
     
     @Bean
-    public ServletRegistrationBean<SimpleHelloServlet> helloServlet() {
-        return new ServletRegistrationBean<>(new SimpleHelloServlet(), "/hello-servlet");
+    public ServletRegistrationBean<com.example.demo.servlet.SimpleHelloServlet> helloServlet() {
+        return new ServletRegistrationBean<>(
+            new com.example.demo.servlet.SimpleHelloServlet(), 
+            "/hello-servlet"
+        );
     }
 }

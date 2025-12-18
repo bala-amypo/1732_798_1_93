@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;  // Add this import
 
 @RestController
 @RequestMapping("/catalog")
@@ -34,20 +35,5 @@ public class CatalogController {
         }
     }
     
-    @PostMapping("/medication")
-    @Operation(summary = "Add a new medication")
-    public ResponseEntity<?> addMedication(@RequestBody Medication medication) {
-        try {
-            Medication savedMedication = catalogService.addMedication(medication);
-            return ResponseEntity.ok(savedMedication);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
-        }
-    }
-    
-    @GetMapping("/medications")
-    @Operation(summary = "Get all medications")
-    public ResponseEntity<List<Medication>> getAllMedications() {
-        return ResponseEntity.ok(catalogService.getAllMedications());
-    }
+    // rest of the code...
 }
