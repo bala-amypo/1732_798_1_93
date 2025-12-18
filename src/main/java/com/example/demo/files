@@ -1,0 +1,38 @@
+├── config/
+│   ├── JwtAuthenticationFilter.java
+│   ├── SecurityConfig.java
+│   ├── SwaggerConfig.java
+│   └── WebConfig.java
+├── controller/
+│   ├── AuthController.java
+│   ├── CatalogController.java
+│   ├── InteractionController.java
+│   └── RuleController.java
+├── dto/
+│   ├── AuthRequest.java
+│   ├── AuthResponse.java
+│   └── ErrorResponse.java
+├── exception/
+│   ├── GlobalExceptionHandler.java
+│   └── ResourceNotFoundException.java
+├── model/
+│   ├── ActiveIngredient.java
+│   ├── InteractionCheckResult.java
+│   ├── InteractionRule.java
+│   ├── Medication.java
+│   └── User.java
+├── repository/
+│   ├── ActiveIngredientRepository.java
+│   ├── InteractionCheckResultRepository.java
+│   ├── InteractionRuleRepository.java
+│   ├── MedicationRepository.java
+│   └── UserRepository.java
+├── security/
+│   ├── CustomUserDetails.java
+│   └── CustomUserDetailsService.java
+├── service/
+│   ├── CatalogService.java
+│   ├── InteractionService.java
+│   ├── RuleService.java
+│   └── UserService.java
+└── DemoApplication.java
