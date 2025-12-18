@@ -1,8 +1,8 @@
 package com.example.demo.model;
 
-import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -26,12 +26,7 @@ public class Medication {
     @Size(min = 1, message = "Medication must include at least one ingredient")
     private Set<ActiveIngredient> ingredients = new HashSet<>();
     
-    public Medication() {}
-    
-    public Medication(String name) {
-        this.name = name;
-    }
-    
+    // Add getters, setters...
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public String getName() { return name; }
