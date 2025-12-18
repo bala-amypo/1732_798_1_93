@@ -8,10 +8,10 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Collections;
 
@@ -32,8 +32,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         
         String path = request.getServletPath();
         
+        // Skip JWT validation for public endpoints
         if (path.startsWith("/auth/") || path.equals("/hello-servlet") || 
-            path.startsWith("/swagger-ui") || path.startsWith("/v3/api-docs")) {
+            path.startsWith("/swagger-ui") || path.startsWith("/v3/api-docs") ||
+            path.equals("/swagger-ui.html") || path.startsWith("/webjars/") ||
+            path.startsWith("/swagger-resources") || path.equals("/")) {
             filterChain.doFilter(request, response);
             return;
         }
@@ -42,27 +45,39 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().write("Missing or invalid Authorization header");
             return;
         }
         
         String token = authHeader.substring(7);
         
-        if (jwtUtil.validateToken(token)) {
-            String username = jwtUtil.extractUsername(token);
-            Long userId = jwtUtil.extractUserId(token);
-            String role = jwtUtil.extractRole(token);
-            
-            UsernamePasswordAuthenticationToken authToken =
-                new UsernamePasswordAuthenticationToken(
-                    username,
-                    null,
-                    Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + role))
-                );
-            
-            authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-            SecurityContextHolder.getContext().setAuthentication(authToken);
-        } else {
+        try {
+            if (jwtUtil.validateToken(token)) {
+                String username = jwtUtil.extractUsername(token);
+                Long userId = jwtUtil.extractUserId(token);
+                String role = jwtUtil.extractRole(token);
+                
+                UsernamePasswordAuthenticationToken authToken =
+                    new UsernamePasswordAuthenticationToken(
+                        username,
+                        null,
+                        Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + role.toUpperCase()))
+                    );
+                
+                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                SecurityContextHolder.getContext().setAuthentication(authToken);
+                
+                // Optional: Add user info to request for use in controllers
+                request.setAttribute("userId", userId);
+                request.setAttribute("username", username);
+            } else {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.getWriter().write("Invalid or expired token");
+                return;
+            }
+        } catch (Exception e) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().write("Authentication failed: " + e.getMessage());
             return;
         }
         
