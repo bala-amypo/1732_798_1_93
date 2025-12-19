@@ -11,10 +11,3 @@ public interface UserService {
     List<User> getAllUsers();
     void deleteUser(Long id);
 }
-
-
-├── AuthServiceImpl.java           (implementation)
-    ├── CatalogServiceImpl.java        (implementation)
-    ├── InteractionServiceImpl.java    (implementation)
-    ├── RuleServiceImpl.java           (implementation)
-    └── UserServiceImpl.java
