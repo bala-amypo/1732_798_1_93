@@ -7,6 +7,7 @@ import com.example.demo.repository.ActiveIngredientRepository;
 import com.example.demo.repository.InteractionRuleRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -21,9 +22,8 @@ public class RuleService {
         this.ingredientRepository = ingredientRepository;
     }
     
-    public InteractionRule createRule(RuleRequest request) {
+    public InteractionRule addRule(RuleRequest request) {
         // Check if rule already exists
-        // FIXED: Changed method name from findRuleBetweenIngredients to findByIngredients
         Optional<InteractionRule> existingRule = ruleRepository.findByIngredients(
             request.getIngredientAId(), request.getIngredientBId());
         
@@ -46,5 +46,9 @@ public class RuleService {
         rule.setDescription(request.getDescription());
         
         return ruleRepository.save(rule);
+    }
+    
+    public List<InteractionRule> getAllRules() {
+        return ruleRepository.findAll();
     }
 }
