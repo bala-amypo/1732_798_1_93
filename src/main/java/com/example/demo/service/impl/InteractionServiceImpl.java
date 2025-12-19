@@ -1,87 +1,37 @@
-package com.example.demo.model;
+package com.example.demo.service.impl;
 
-import jakarta.persistence.*;
-import java.time.LocalDateTime;
-import java.util.Date;
+import com.example.demo.model.*;
+import com.example.demo.repository.*;
+import com.example.demo.service.CatalogService;
+import com.example.demo.service.InteractionService;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import java.util.*;
 
-@Entity
-public class InteractionCheckResult {
+@Service
+@Transactional
+public class InteractionServiceImpl implements InteractionService {
     
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private final InteractionRuleRepository ruleRepository;
+    private final InteractionCheckResultRepository resultRepository;
+    private final MedicationRepository medicationRepository;
+    private final CatalogService catalogService;
     
-    private String medicationNames;
-    private String interactions;
-    private int totalInteractions;
-    private int criticalInteractions;
-    private boolean hasInteractions;
-    
-    // Add this field
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date checkDate; // Or use LocalDateTime if you prefer
-    
-    // Constructors
-    public InteractionCheckResult() {
-        this.checkDate = new Date(); // Set default date
+    public InteractionServiceImpl(InteractionRuleRepository ruleRepository,
+                                 InteractionCheckResultRepository resultRepository,
+                                 MedicationRepository medicationRepository,
+                                 CatalogService catalogService) {
+        this.ruleRepository = ruleRepository;
+        this.resultRepository = resultRepository;
+        this.medicationRepository = medicationRepository;
+        this.catalogService = catalogService;
     }
     
-    // Getters and Setters
-    public Long getId() {
-        return id;
+    @Override
+    public InteractionCheckResult checkInteractions(List<Long> medicationIds) {
+        // ... your existing implementation ...
+        // REMOVE any class definition for InteractionCheckResult from here
     }
     
-    public void setId(Long id) {
-        this.id = id;
-    }
-    
-    public String getMedicationNames() {
-        return medicationNames;
-    }
-    
-    public void setMedicationNames(String medicationNames) {
-        this.medicationNames = medicationNames;
-    }
-    
-    public String getInteractions() {
-        return interactions;
-    }
-    
-    public void setInteractions(String interactions) {
-        this.interactions = interactions;
-    }
-    
-    public int getTotalInteractions() {
-        return totalInteractions;
-    }
-    
-    public void setTotalInteractions(int totalInteractions) {
-        this.totalInteractions = totalInteractions;
-    }
-    
-    public int getCriticalInteractions() {
-        return criticalInteractions;
-    }
-    
-    public void setCriticalInteractions(int criticalInteractions) {
-        this.criticalInteractions = criticalInteractions;
-    }
-    
-    public boolean isHasInteractions() {
-        return hasInteractions;
-    }
-    
-    public void setHasInteractions(boolean hasInteractions) {
-        this.hasInteractions = hasInteractions;
-    }
-    
-    // ADD THIS METHOD:
-    public Date getCheckDate() {
-        return checkDate;
-    }
-    
-    // ADD THIS METHOD:
-    public void setCheckDate(Date checkDate) {
-        this.checkDate = checkDate;
-    }
+    // ... other methods ...
 }

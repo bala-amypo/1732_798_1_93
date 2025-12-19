@@ -1,165 +1,175 @@
-package com.example.demo.model;
+package com.example.demo.service.impl;
 
-import jakarta.persistence.*;
+import com.example.demo.model.*;
+import com.example.demo.repository.*;
+import com.example.demo.service.CatalogService;
+import com.example.demo.service.InteractionService;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.time.LocalDateTime;
+import java.util.*;
 
-@Entity
-@Table(name = "interaction_check_results")
-public class InteractionCheckResult {
+@Service
+@Transactional
+public class InteractionServiceImpl implements InteractionService {
     
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private final InteractionRuleRepository ruleRepository;
+    private final InteractionCheckResultRepository resultRepository;
+    private final MedicationRepository medicationRepository;
+    private final CatalogService catalogService;
     
-    @Column(name = "medication_names", length = 2000)
-    private String medicationNames;
-    
-    @Column(name = "medication_ids", length = 2000)
-    private String medicationIds;
-    
-    @Column(columnDefinition = "TEXT")
-    private String interactions;
-    
-    @Column(name = "total_interactions")
-    private Integer totalInteractions;
-    
-    @Column(name = "critical_interactions")
-    private Integer criticalInteractions;
-    
-    @Column(name = "user_id")
-    private Long userId;
-    
-    @Column(name = "user_email")
-    private String userEmail;
-    
-    @Column(name = "session_id", length = 100)
-    private String sessionId;
-    
-    @Column(name = "checked_at")
-    private LocalDateTime checkedAt;
-    
-    @Column(name = "has_interactions")
-    private Boolean hasInteractions = false;
-    
-    @Column(name = "recommendations", columnDefinition = "TEXT")
-    private String recommendations;
-    
-    // Optional: Reference to medications if needed
-    /*
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-        name = "result_medications",
-        joinColumns = @JoinColumn(name = "result_id"),
-        inverseJoinColumns = @JoinColumn(name = "medication_id")
-    )
-    private Set<Medication> medications = new HashSet<>();
-    */
-    
-    @PrePersist
-    protected void onCreate() {
-        if (checkedAt == null) {
-            checkedAt = LocalDateTime.now();
-        }
-        if (hasInteractions == null) {
-            hasInteractions = (totalInteractions != null && totalInteractions > 0);
-        }
+    public InteractionServiceImpl(InteractionRuleRepository ruleRepository,
+                                 InteractionCheckResultRepository resultRepository,
+                                 MedicationRepository medicationRepository,
+                                 CatalogService catalogService) {
+        this.ruleRepository = ruleRepository;
+        this.resultRepository = resultRepository;
+        this.medicationRepository = medicationRepository;
+        this.catalogService = catalogService;
     }
-    
-    public InteractionCheckResult() {}
-    
-    public InteractionCheckResult(String medicationNames, String interactions) {
-        this.medicationNames = medicationNames;
-        this.interactions = interactions;
-        this.hasInteractions = interactions != null && !interactions.isEmpty();
-    }
-    
-    public InteractionCheckResult(String medicationNames, String medicationIds, 
-                                String interactions, Integer totalInteractions, 
-                                Integer criticalInteractions, Long userId, 
-                                String userEmail) {
-        this.medicationNames = medicationNames;
-        this.medicationIds = medicationIds;
-        this.interactions = interactions;
-        this.totalInteractions = totalInteractions;
-        this.criticalInteractions = criticalInteractions;
-        this.userId = userId;
-        this.userEmail = userEmail;
-        this.hasInteractions = totalInteractions != null && totalInteractions > 0;
-    }
-    
-    // Helper method to calculate severity summary
-    public String getSeveritySummary() {
-        if (criticalInteractions == null || totalInteractions == null) {
-            return "No data";
-        }
-        if (totalInteractions == 0) {
-            return "No interactions found";
-        }
-        if (criticalInteractions > 0) {
-            return "Critical: " + criticalInteractions + " out of " + totalInteractions + " interactions";
-        }
-        return "Non-critical: " + totalInteractions + " interactions";
-    }
-    
-    // Helper method to check if result contains critical interactions
-    public boolean hasCriticalInteractions() {
-        return criticalInteractions != null && criticalInteractions > 0;
-    }
-    
-    // Getters and Setters
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
-    
-    public String getMedicationNames() { return medicationNames; }
-    public void setMedicationNames(String medicationNames) { this.medicationNames = medicationNames; }
-    
-    public String getMedicationIds() { return medicationIds; }
-    public void setMedicationIds(String medicationIds) { this.medicationIds = medicationIds; }
-    
-    public String getInteractions() { return interactions; }
-    public void setInteractions(String interactions) { 
-        this.interactions = interactions;
-        if (interactions != null) {
-            this.hasInteractions = !interactions.isEmpty();
-        }
-    }
-    
-    public Integer getTotalInteractions() { return totalInteractions; }
-    public void setTotalInteractions(Integer totalInteractions) { 
-        this.totalInteractions = totalInteractions;
-        this.hasInteractions = totalInteractions != null && totalInteractions > 0;
-    }
-    
-    public Integer getCriticalInteractions() { return criticalInteractions; }
-    public void setCriticalInteractions(Integer criticalInteractions) { this.criticalInteractions = criticalInteractions; }
-    
-    public Long getUserId() { return userId; }
-    public void setUserId(Long userId) { this.userId = userId; }
-    
-    public String getUserEmail() { return userEmail; }
-    public void setUserEmail(String userEmail) { this.userEmail = userEmail; }
-    
-    public String getSessionId() { return sessionId; }
-    public void setSessionId(String sessionId) { this.sessionId = sessionId; }
-    
-    public LocalDateTime getCheckedAt() { return checkedAt; }
-    public void setCheckedAt(LocalDateTime checkedAt) { this.checkedAt = checkedAt; }
-    
-    public Boolean getHasInteractions() { return hasInteractions; }
-    public void setHasInteractions(Boolean hasInteractions) { this.hasInteractions = hasInteractions; }
-    
-    public String getRecommendations() { return recommendations; }
-    public void setRecommendations(String recommendations) { this.recommendations = recommendations; }
     
     @Override
-    public String toString() {
-        return "InteractionCheckResult{" +
-                "id=" + id +
-                ", medicationNames='" + medicationNames + '\'' +
-                ", totalInteractions=" + totalInteractions +
-                ", criticalInteractions=" + criticalInteractions +
-                ", hasInteractions=" + hasInteractions +
-                ", checkedAt=" + checkedAt +
-                '}';
+    public InteractionCheckResult checkInteractions(List<Long> medicationIds) {
+        return checkInteractions(medicationIds, null, null, null);
+    }
+    
+    public InteractionCheckResult checkInteractions(List<Long> medicationIds, Long userId, String userEmail, String sessionId) {
+        if (medicationIds == null || medicationIds.size() < 2) {
+            throw new IllegalArgumentException("Need at least 2 medications to check interactions");
+        }
+        
+        // Get medications
+        List<Medication> medications = new ArrayList<>();
+        for (Long id : medicationIds) {
+            medications.add(catalogService.getMedicationById(id));
+        }
+        
+        // Extract all unique ingredients from all medications
+        Set<ActiveIngredient> allIngredients = new HashSet<>();
+        for (Medication medication : medications) {
+            allIngredients.addAll(medication.getIngredients());
+        }
+        
+        // Check for interactions between all ingredient pairs
+        List<String> interactionList = new ArrayList<>();
+        int totalInteractions = 0;
+        int criticalInteractions = 0;
+        
+        List<ActiveIngredient> ingredientList = new ArrayList<>(allIngredients);
+        for (int i = 0; i < ingredientList.size(); i++) {
+            for (int j = i + 1; j < ingredientList.size(); j++) {
+                ActiveIngredient ingA = ingredientList.get(i);
+                ActiveIngredient ingB = ingredientList.get(j);
+                
+                Optional<InteractionRule> rule = ruleRepository.findByIngredients(
+                    ingA.getId(), ingB.getId());
+                
+                if (rule.isPresent()) {
+                    totalInteractions++;
+                    if ("CRITICAL".equalsIgnoreCase(rule.get().getSeverity())) {
+                        criticalInteractions++;
+                    }
+                    interactionList.add(String.format("%s & %s: %s (Severity: %s)", 
+                        ingA.getName(), ingB.getName(), 
+                        rule.get().getDescription(), 
+                        rule.get().getSeverity()));
+                }
+            }
+        }
+        
+        // Build medication IDs string
+        String medicationIdsStr = medicationIds.stream()
+            .map(String::valueOf)
+            .reduce((a, b) -> a + "," + b)
+            .orElse("");
+        
+        // Create result object
+        InteractionCheckResult result = new InteractionCheckResult();
+        result.setMedicationNames(buildMedicationNames(medications));
+        result.setMedicationIds(medicationIdsStr);
+        result.setInteractions(String.join("\n", interactionList));
+        result.setTotalInteractions(totalInteractions);
+        result.setCriticalInteractions(criticalInteractions);
+        result.setHasInteractions(totalInteractions > 0);
+        
+        // Set user info if provided
+        if (userId != null) {
+            result.setUserId(userId);
+        }
+        if (userEmail != null) {
+            result.setUserEmail(userEmail);
+        }
+        if (sessionId != null) {
+            result.setSessionId(sessionId);
+        }
+        
+        // Set checkedAt - will be auto-set by @PrePersist, but we can set it manually too
+        result.setCheckedAt(LocalDateTime.now());
+        
+        return resultRepository.save(result);
+    }
+    
+    private String buildMedicationNames(List<Medication> medications) {
+        List<String> names = new ArrayList<>();
+        for (Medication med : medications) {
+            names.add(med.getName());
+        }
+        return String.join(", ", names);
+    }
+    
+    @Override
+    public InteractionCheckResult getResult(Long id) {
+        return resultRepository.findById(id)
+            .orElseThrow(() -> new IllegalArgumentException("Result not found with id: " + id));
+    }
+    
+    @Override
+    public List<InteractionCheckResult> getAllResults() {
+        return resultRepository.findAll();
+    }
+    
+    // Additional method to get results by user
+    public List<InteractionCheckResult> getResultsByUser(Long userId) {
+        return resultRepository.findByUserIdOrderByCheckedAtDesc(userId);
+    }
+    
+    // Method to get results by session
+    public List<InteractionCheckResult> getResultsBySession(String sessionId) {
+        return resultRepository.findBySessionIdOrderByCheckedAtDesc(sessionId);
+    }
+    
+    // Method to generate recommendations based on interactions
+    public String generateRecommendations(InteractionCheckResult result) {
+        if (result.getTotalInteractions() == null || result.getTotalInteractions() == 0) {
+            return "No interactions detected. Medications appear to be safe to take together.";
+        }
+        
+        StringBuilder recommendations = new StringBuilder();
+        recommendations.append("Interaction Check Results:\n");
+        recommendations.append("===========================\n\n");
+        
+        if (result.hasCriticalInteractions()) {
+            recommendations.append("⚠️ **WARNING: CRITICAL INTERACTIONS DETECTED** ⚠️\n");
+            recommendations.append("Found ").append(result.getCriticalInteractions()).append(" critical interaction(s).\n");
+            recommendations.append("Recommendation: Consult a healthcare professional immediately.\n");
+            recommendations.append("Consider alternative medications or adjusted dosages.\n\n");
+        } else {
+            recommendations.append("✅ No critical interactions found.\n");
+            recommendations.append("Found ").append(result.getTotalInteractions()).append(" non-critical interaction(s).\n");
+            recommendations.append("Recommendation: Monitor for side effects.\n");
+            recommendations.append("Consider taking medications at different times if possible.\n\n");
+        }
+        
+        recommendations.append("Detected Interactions:\n");
+        recommendations.append(result.getInteractions()).append("\n\n");
+        
+        recommendations.append("General Advice:\n");
+        recommendations.append("- Always follow your doctor's prescription\n");
+        recommendations.append("- Report any unusual symptoms immediately\n");
+        recommendations.append("- Keep a medication diary\n");
+        recommendations.append("- Inform all healthcare providers about all medications you're taking\n");
+        
+        return recommendations.toString();
     }
 }
