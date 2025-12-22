@@ -4,7 +4,6 @@ import com.example.demo.model.ActiveIngredient;
 import com.example.demo.model.Medication;
 import com.example.demo.service.CatalogService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,7 +14,8 @@ import java.util.Map;
 @RestController
 @RequestMapping("/catalog")
 @Tag(name = "Catalog", description = "Medication and ingredient catalog management")
-@SecurityRequirement(name = "bearer-key")
+// REMOVE THIS LINE TEMPORARILY:
+// @SecurityRequirement(name = "bearer-key")
 public class CatalogController {
     
     private final CatalogService catalogService;
@@ -51,5 +51,13 @@ public class CatalogController {
     public ResponseEntity<List<Medication>> getAllMedications() {
         List<Medication> medications = catalogService.getAllMedications();
         return ResponseEntity.ok(medications);
+    }
+    
+    // Additional endpoints for completeness
+    @GetMapping("/ingredients")
+    @Operation(summary = "List all ingredients")
+    public ResponseEntity<List<ActiveIngredient>> getAllIngredients() {
+        List<ActiveIngredient> ingredients = catalogService.getAllIngredients();
+        return ResponseEntity.ok(ingredients);
     }
 }
