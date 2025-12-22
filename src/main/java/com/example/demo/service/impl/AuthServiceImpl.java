@@ -23,7 +23,7 @@ public class AuthServiceImpl implements AuthService {
             throw new IllegalArgumentException("Email already exists");
         }
         
-        if (user.getRole() == null) {
+        if (user.getRole() == null || user.getRole().isEmpty()) {
             user.setRole("USER");
         }
         

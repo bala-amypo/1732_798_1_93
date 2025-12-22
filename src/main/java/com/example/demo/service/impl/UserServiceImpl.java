@@ -5,7 +5,6 @@ import com.example.demo.repository.UserRepository;
 import com.example.demo.service.UserService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import java.util.List;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -19,9 +18,13 @@ public class UserServiceImpl implements UserService {
     }
     
     @Override
-    public User register(User user) {
+    public User registerUser(User user) {
         if (userRepository.existsByEmail(user.getEmail())) {
             throw new IllegalArgumentException("Email already exists");
+        }
+        
+        if (user.getRole() == null || user.getRole().isEmpty()) {
+            user.setRole("USER");
         }
         
         user.setPassword(passwordEncoder.encode(user.getPassword()));
@@ -31,27 +34,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public User findByEmail(String email) {
         return userRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(() -> new IllegalArgumentException("User not found with email: " + email));
     }
     
     @Override
     public boolean validatePassword(String rawPassword, String encodedPassword) {
         return passwordEncoder.matches(rawPassword, encodedPassword);
-    }
-    
-    @Override
-    public User findById(Long id) {
-        return userRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + id));
-    }
-    
-    @Override
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
-    }
-    
-    @Override
-    public void deleteUser(Long id) {
-        userRepository.deleteById(id);
     }
 }

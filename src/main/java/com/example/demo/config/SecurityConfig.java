@@ -20,13 +20,11 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .csrf(csrf -> csrf.disable())  // Disable CSRF for API testing
+            .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(authz -> authz
-                // Allow all endpoints without authentication
+                // Allow ALL requests without any authentication
                 .anyRequest().permitAll()
-            )
-            .httpBasic(basic -> basic.disable())  // Disable basic auth
-            .formLogin(form -> form.disable());   // Disable form login
+            );
         
         return http.build();
     }
