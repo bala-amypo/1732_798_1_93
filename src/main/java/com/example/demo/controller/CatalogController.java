@@ -7,15 +7,14 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 import java.util.Map;
 
 @RestController
 @RequestMapping("/catalog")
 @Tag(name = "Catalog", description = "Medication and ingredient catalog management")
-// REMOVE THIS LINE TEMPORARILY:
-// @SecurityRequirement(name = "bearer-key")
+// REMOVE THIS LINE:
+// @SecurityRequirement(name = "bearerAuth")
 public class CatalogController {
     
     private final CatalogService catalogService;
@@ -53,7 +52,6 @@ public class CatalogController {
         return ResponseEntity.ok(medications);
     }
     
-    // Additional endpoints for completeness
     @GetMapping("/ingredients")
     @Operation(summary = "List all ingredients")
     public ResponseEntity<List<ActiveIngredient>> getAllIngredients() {
