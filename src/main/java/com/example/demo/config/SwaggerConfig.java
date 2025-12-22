@@ -16,6 +16,15 @@ public class SwaggerConfig {
                 .servers(List.of(
                         new Server().url("https://9134.408procr.amypo.ai/")
                 ));
+                .title("Medication Catalog API")
+                        .version("1.0")
+                        .description("API for managing medications and ingredients"))
+                .components(new Components()
+                        .addSecuritySchemes("bearer-key",
+                                new SecurityScheme()
+                                        .type(SecurityScheme.Type.HTTP)
+                                        .scheme("bearer")
+                                        .bearerFormat("JWT")));
         }
 }
 
