@@ -1,4 +1,3 @@
-// JwtAuthenticationFilter.java
 package com.example.demo.security;
 
 import com.example.demo.util.JwtUtil;
@@ -44,9 +43,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         email = jwtUtil.extractUsername(jwt);
         
         if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = this.userDetailsService.loadUserByUsername(email);
-            
-            if (jwtUtil.validateToken(jwt, userDetails)) {
+            // FIXED: Use validateToken with just the token
+            if (jwtUtil.validateToken(jwt)) {
+                UserDetails userDetails = this.userDetailsService.loadUserByUsername(email);
+                
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                     userDetails, null, userDetails.getAuthorities());
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
