@@ -4,7 +4,6 @@ import com.example.demo.config.JwtUtil;
 import com.example.demo.model.User;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.service.AuthService;
-import com.example.demo.util.JwtUtil;  // Changed from config to util
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
