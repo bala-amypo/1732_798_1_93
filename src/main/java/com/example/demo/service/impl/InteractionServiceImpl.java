@@ -1,6 +1,7 @@
 package com.example.demo.service.impl;
 
 import com.example.demo.model.InteractionCheckResult;
+import com.example.demo.model.InteractionRule;
 import com.example.demo.model.Medication;
 import com.example.demo.repository.InteractionCheckResultRepository;
 import com.example.demo.repository.InteractionRuleRepository;
@@ -10,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -37,10 +37,18 @@ public class InteractionServiceImpl implements InteractionService {
         String medications = String.join(", ", medicationNames);
         
         // Check for interactions
-        boolean hasInteraction = checkForInteractions(medicationIds);
-        String interactionDetails = hasInteraction ? 
-            "Potential interaction found between medications" : 
-            "No interactions found";
+        List<InteractionRule> foundRules = ruleRepository.findByMedicationIds(medicationIds);
+        boolean hasInteraction = !foundRules.isEmpty();
+        
+        String interactionDetails;
+        if (hasInteraction) {
+            interactionDetails = foundRules.stream()
+                    .map(r -> String.format("Interaction between medication %d and %d: %s - %s", 
+                            r.getMedication1Id(), r.getMedication2Id(), r.getSeverity(), r.getDescription()))
+                    .collect(Collectors.joining("; "));
+        } else {
+            interactionDetails = "No interactions found";
+        }
         
         // Create and save result
         InteractionCheckResult result = new InteractionCheckResult(
@@ -61,11 +69,5 @@ public class InteractionServiceImpl implements InteractionService {
     public InteractionCheckResult getResult(Long id) {
         return resultRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Result not found with id: " + id));
-    }
-    
-    private boolean checkForInteractions(List<Long> medicationIds) {
-        // Simplified interaction check logic
-        // In real implementation, check rules in InteractionRuleRepository
-        return medicationIds.size() > 1 && ruleRepository.existsByMedicationIds(medicationIds);
     }
 }
