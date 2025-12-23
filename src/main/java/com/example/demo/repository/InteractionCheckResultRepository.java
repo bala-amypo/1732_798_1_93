@@ -10,20 +10,18 @@ public class InteractionCheckResult {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
-    @Column(name = "medications")
     private String medications;
     
-    @Column(name = "interactions", columnDefinition = "TEXT")
+    @Column(columnDefinition = "TEXT")
     private String interactions;
     
     @Column(name = "checked_at")
     private LocalDateTime checkedAt;
     
-    // NO-ARG CONSTRUCTOR
+    // Constructors
     public InteractionCheckResult() {
     }
     
-    // CONSTRUCTOR FOR TESTING
     public InteractionCheckResult(String medications, String interactions) {
         this.medications = medications;
         this.interactions = interactions;
@@ -31,15 +29,35 @@ public class InteractionCheckResult {
     }
     
     // Getters and Setters
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    public Long getId() { 
+        return id; 
+    }
     
-    public String getMedications() { return medications; }
-    public void setMedications(String medications) { this.medications = medications; }
+    public void setId(Long id) { 
+        this.id = id; 
+    }
     
-    public String getInteractions() { return interactions; }
-    public void setInteractions(String interactions) { this.interactions = interactions; }
+    public String getMedications() { 
+        return medications; 
+    }
     
-    public LocalDateTime getCheckedAt() { return checkedAt; }
-    public void setCheckedAt(LocalDateTime checkedAt) { this.checkedAt = checkedAt; }
+    public void setMedications(String medications) { 
+        this.medications = medications; 
+    }
+    
+    public String getInteractions() { 
+        return interactions; 
+    }
+    
+    public void setInteractions(String interactions) { 
+        this.interactions = interactions; 
+    }
+    
+    public LocalDateTime getCheckedAt() { 
+        return checkedAt; 
+    }
+    
+    public void setCheckedAt(LocalDateTime checkedAt) { 
+        this.checkedAt = checkedAt; 
+    }
 }

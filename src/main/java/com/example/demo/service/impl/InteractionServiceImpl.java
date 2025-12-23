@@ -38,6 +38,7 @@ public class InteractionServiceImpl implements InteractionService {
     @Override
     @Transactional
     public InteractionCheckResult checkInteractions(List<Long> medicationIds) {
+        // Create a simple result for testing
         InteractionCheckResult result = new InteractionCheckResult();
         result.setMedications("Test Medications");
         result.setInteractions("{\"test\": \"interaction\"}");
@@ -46,12 +47,13 @@ public class InteractionServiceImpl implements InteractionService {
         if (resultRepository != null) {
             return resultRepository.save(result);
         }
-        return result; // For testing
+        return result; // For testing when repository is null
     }
     
     @Override
     public InteractionCheckResult getResult(Long id) {
         if (resultRepository == null) {
+            // For testing
             InteractionCheckResult result = new InteractionCheckResult();
             result.setId(id);
             return result;
