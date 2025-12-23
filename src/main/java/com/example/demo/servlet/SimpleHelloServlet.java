@@ -7,7 +7,6 @@ import jakarta.servlet.annotation.WebServlet;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-// Add @WebServlet annotation to map the servlet
 @WebServlet("/hello")
 public class SimpleHelloServlet extends HttpServlet {
     
