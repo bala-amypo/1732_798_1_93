@@ -17,11 +17,12 @@
 	<properties>
 		<java.version>17</java.version>
 		<jjwt.version>0.12.6</jjwt.version>
-		<!-- Add TestNG version -->
 		<testng.version>7.8.0</testng.version>
+		<springdoc.version>2.3.0</springdoc.version>
 	</properties>
 	
 	<dependencies>
+		<!-- Spring Boot Starters -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
@@ -42,14 +43,20 @@
 			<artifactId>spring-boot-starter-validation</artifactId>
 		</dependency>
 		
-		<!-- H2 Database for testing -->
+		<!-- Database Drivers -->
 		<dependency>
 			<groupId>com.h2database</groupId>
 			<artifactId>h2</artifactId>
 			<scope>runtime</scope>
 		</dependency>
 		
-		<!-- JWT -->
+		<dependency>
+			<groupId>com.mysql</groupId>
+			<artifactId>mysql-connector-j</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+		
+		<!-- JWT (JSON Web Token) -->
 		<dependency>
 			<groupId>io.jsonwebtoken</groupId>
 			<artifactId>jjwt-api</artifactId>
@@ -68,21 +75,21 @@
 			<scope>runtime</scope>
 		</dependency>
 		
-		<!-- OpenAPI -->
+		<!-- Jakarta Servlet API for Spring Boot 3 -->
+		<dependency>
+			<groupId>jakarta.servlet</groupId>
+			<artifactId>jakarta.servlet-api</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		
+		<!-- OpenAPI/Swagger Documentation -->
 		<dependency>
 			<groupId>org.springdoc</groupId>
 			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-			<version>2.3.0</version>
+			<version>${springdoc.version}</version>
 		</dependency>
 		
-		<!-- MySQL Connector -->
-        <dependency>
-            <groupId>com.mysql</groupId>
-            <artifactId>mysql-connector-j</artifactId>
-            <scope>runtime</scope>
-        </dependency>
-		
-		<!-- Testing - TestNG -->
+		<!-- Testing Dependencies -->
 		<dependency>
 			<groupId>org.testng</groupId>
 			<artifactId>testng</artifactId>
@@ -90,7 +97,6 @@
 			<scope>test</scope>
 		</dependency>
 		
-		<!-- Spring Boot Test with JUnit excluded -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
@@ -112,6 +118,20 @@
 			<artifactId>spring-security-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+		
+		<!-- Lombok (Optional but recommended) -->
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<optional>true</optional>
+		</dependency>
+		
+		<!-- ModelMapper for DTO conversions -->
+		<dependency>
+			<groupId>org.modelmapper</groupId>
+			<artifactId>modelmapper</artifactId>
+			<version>3.2.0</version>
+		</dependency>
 	</dependencies>
 	
 	<build>
@@ -119,15 +139,44 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+					<excludes>
+						<exclude>
+							<groupId>org.projectlombok</groupId>
+							<artifactId>lombok</artifactId>
+						</exclude>
+					</excludes>
+				</configuration>
 			</plugin>
 			
-			<!-- Maven Surefire Plugin configured for TestNG -->
+			<!-- Maven Compiler Plugin -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.13.0</version>
+				<configuration>
+					<source>${java.version}</source>
+					<target>${java.version}</target>
+					<annotationProcessorPaths>
+						<path>
+							<groupId>org.projectlombok</groupId>
+							<artifactId>lombok</artifactId>
+							<version>1.18.30</version>
+						</path>
+					</annotationProcessorPaths>
+				</configuration>
+			</plugin>
+			
+			<!-- Maven Surefire Plugin for TestNG -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>3.2.5</version>
 				<configuration>
 					<useSystemClassLoader>false</useSystemClassLoader>
+					<suiteXmlFiles>
+						<suiteXmlFile>src/test/resources/testng.xml</suiteXmlFile>
+					</suiteXmlFiles>
 				</configuration>
 				<dependencies>
 					<dependency>
@@ -140,4 +189,3 @@
 		</plugins>
 	</build>
 </project>
-
