@@ -1,7 +1,6 @@
 package com.example.demo.model;
 
 import jakarta.persistence.*;
-import java.util.List;
 
 @Entity
 @Table(name = "interaction_rules")
@@ -17,7 +16,6 @@ public class InteractionRule {
     @Column(name = "medication2_id")
     private Long medication2Id;
     
-    // Add ingredient fields
     @ManyToOne
     @JoinColumn(name = "ingredient_a_id")
     private ActiveIngredient ingredientA;
@@ -30,7 +28,7 @@ public class InteractionRule {
     private String interactionType;
     
     @Column(name = "severity")
-    private String severity; // HIGH, MEDIUM, LOW
+    private String severity;
     
     @Column(name = "description", length = 1000)
     private String description;
@@ -41,7 +39,17 @@ public class InteractionRule {
     // Constructors
     public InteractionRule() {}
     
-    // Constructor with ingredients
+    // Add this constructor for test compatibility (4 parameters)
+    public InteractionRule(ActiveIngredient ingredientA, ActiveIngredient ingredientB, 
+                          String interactionType, String severity) {
+        this.ingredientA = ingredientA;
+        this.ingredientB = ingredientB;
+        this.interactionType = interactionType;
+        this.severity = severity;
+        this.description = "";
+        this.recommendation = "";
+    }
+    
     public InteractionRule(ActiveIngredient ingredientA, ActiveIngredient ingredientB, 
                           String interactionType, String severity, String description, String recommendation) {
         this.ingredientA = ingredientA;
@@ -52,7 +60,6 @@ public class InteractionRule {
         this.recommendation = recommendation;
     }
     
-    // Constructor with medication IDs
     public InteractionRule(Long medication1Id, Long medication2Id, String interactionType, 
                           String severity, String description, String recommendation) {
         this.medication1Id = medication1Id;

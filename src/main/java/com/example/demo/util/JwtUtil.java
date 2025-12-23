@@ -1,4 +1,4 @@
-package com.example.demo.util;  // Changed from com.example.demo.config
+package com.example.demo.util;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -58,6 +58,14 @@ public class JwtUtil {
         return createToken(claims, userDetails.getUsername());
     }
     
+    // Add this method for test compatibility
+    public String generateToken(String username, long userId, String role) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("userId", userId);
+        claims.put("role", role);
+        return createToken(claims, username);
+    }
+    
     private String createToken(Map<String, Object> claims, String subject) {
         return Jwts.builder()
                 .claims(claims)
@@ -71,5 +79,14 @@ public class JwtUtil {
     public Boolean validateToken(String token, UserDetails userDetails) {
         final String username = extractUsername(token);
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+    }
+    
+    // Add these methods for test compatibility
+    public Long extractUserId(String token) {
+        return extractClaim(token, claims -> claims.get("userId", Long.class));
+    }
+    
+    public String extractRole(String token) {
+        return extractClaim(token, claims -> claims.get("role", String.class));
     }
 }

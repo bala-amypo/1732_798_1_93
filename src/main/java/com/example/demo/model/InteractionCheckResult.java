@@ -12,10 +12,10 @@ public class InteractionCheckResult {
     private Long id;
     
     @Column(name = "medication_names")
-    private String medicationNames;  // Changed from medications
+    private String medicationNames;
     
     @Column(name = "interaction_details")
-    private String interactionDetails;  // Changed from interactions
+    private String interactionDetails;
     
     @Column(name = "has_interaction")
     private boolean hasInteraction;
@@ -24,6 +24,14 @@ public class InteractionCheckResult {
     
     // Constructors
     public InteractionCheckResult() {
+        this.checkedAt = LocalDateTime.now();
+    }
+    
+    // Add this constructor for test compatibility (2 parameters)
+    public InteractionCheckResult(String medicationNames, String interactions) {
+        this.medicationNames = medicationNames;
+        this.interactionDetails = interactions;
+        this.hasInteraction = true;
         this.checkedAt = LocalDateTime.now();
     }
     
@@ -43,6 +51,15 @@ public class InteractionCheckResult {
     
     public String getInteractionDetails() { return interactionDetails; }
     public void setInteractionDetails(String interactionDetails) { this.interactionDetails = interactionDetails; }
+    
+    // Add alias methods for test compatibility
+    public String getInteractions() {
+        return this.interactionDetails;
+    }
+    
+    public void setInteractions(String interactions) {
+        this.interactionDetails = interactions;
+    }
     
     public boolean isHasInteraction() { return hasInteraction; }
     public void setHasInteraction(boolean hasInteraction) { this.hasInteraction = hasInteraction; }

@@ -1,7 +1,8 @@
 package com.example.demo.model;
 
 import jakarta.persistence.*;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "medications")
@@ -25,17 +26,24 @@ public class Medication {
     
     private String strength;
     
-    // Relationships
+    // Relationships - Changed to Set for test compatibility
     @ManyToMany
     @JoinTable(
         name = "medication_ingredients",
         joinColumns = @JoinColumn(name = "medication_id"),
         inverseJoinColumns = @JoinColumn(name = "ingredient_id")
     )
-    private List<ActiveIngredient> ingredients;  // Changed from activeIngredients to ingredients
+    private Set<ActiveIngredient> ingredients = new HashSet<>();
     
     // Constructors
     public Medication() {}
+    
+    // Add this constructor for test compatibility
+    public Medication(String name) {
+        this.name = name;
+        this.genericName = name;
+        this.description = "";
+    }
     
     public Medication(String name, String genericName, String description) {
         this.name = name;
@@ -62,8 +70,24 @@ public class Medication {
     public String getStrength() { return strength; }
     public void setStrength(String strength) { this.strength = strength; }
     
-    public List<ActiveIngredient> getIngredients() { return ingredients; }  // Changed from getActiveIngredients
-    public void setIngredients(List<ActiveIngredient> ingredients) {  // Changed from setActiveIngredients
+    public Set<ActiveIngredient> getIngredients() { return ingredients; }
+    public void setIngredients(Set<ActiveIngredient> ingredients) { 
         this.ingredients = ingredients; 
+    }
+    
+    // Add these methods for test compatibility
+    public void addIngredient(ActiveIngredient ingredient) {
+        this.ingredients.add(ingredient);
+        if (ingredient.getMedications() != null) {
+            ingredient.getMedications().add(this);
+        }
+    }
+    
+    public boolean removeIngredient(ActiveIngredient ingredient) {
+        boolean removed = this.ingredients.remove(ingredient);
+        if (removed && ingredient.getMedications() != null) {
+            ingredient.getMedications().remove(this);
+        }
+        return removed;
     }
 }
