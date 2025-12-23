@@ -37,20 +37,38 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(authz -> authz
                 .requestMatchers(
+                    // Auth endpoints
                     "/api/auth/**",
+                    // Swagger/OpenAPI
                     "/swagger-ui/**",
                     "/v3/api-docs/**",
                     "/swagger-resources/**",
                     "/webjars/**",
-                    "/h2-console/**"
+                    "/swagger-ui.html",
+                    // H2 Console
+                    "/h2-console/**",
+                    // Actuator (if you use it)
+                    "/actuator/**",
+                    // Public API endpoints (if any)
+                    "/api/test/**",
+                    // Allow OPTIONS requests for CORS
+                    "/**/options"
                 ).permitAll()
+                // Allow GET requests to catalog without auth (if needed)
+                .requestMatchers("/api/catalog/**").permitAll()
+                .requestMatchers("/api/medications/**").permitAll()
+                .requestMatchers("/api/ingredients/**").permitAll()
+                // All other requests require authentication
                 .anyRequest().authenticated()
             )
             .sessionManagement(session -> session
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            );
+            )
+            // Add JWT filter
+            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         
-        http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+        // For H2 console (if using)
+        http.headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()));
         
         return http.build();
     }
@@ -58,10 +76,27 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:3000", "http://localhost:9001"));
+        configuration.setAllowedOrigins(List.of(
+            "http://localhost:3000",
+            "http://localhost:9001",
+            "https://9272.pro604cr.amypo.ai"
+        ));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
-        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "X-Requested-With"));
-        configuration.setExposedHeaders(List.of("Authorization"));
+        configuration.setAllowedHeaders(Arrays.asList(
+            "Authorization",
+            "Content-Type",
+            "X-Requested-With",
+            "Accept",
+            "Origin",
+            "Access-Control-Request-Method",
+            "Access-Control-Request-Headers"
+        ));
+        configuration.setExposedHeaders(List.of(
+            "Authorization",
+            "Content-Type",
+            "Access-Control-Allow-Origin",
+            "Access-Control-Allow-Credentials"
+        ));
         configuration.setAllowCredentials(true);
         configuration.setMaxAge(3600L);
         
