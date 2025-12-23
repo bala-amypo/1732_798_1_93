@@ -82,4 +82,9 @@ public class AuthServiceImpl implements AuthService {
             return false;
         }
     }
+    
+    @Override
+    public boolean validatePassword(String rawPassword, String encodedPassword) {
+        return passwordEncoder.matches(rawPassword, encodedPassword);
+    }
 }

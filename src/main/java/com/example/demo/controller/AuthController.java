@@ -19,15 +19,16 @@ public class AuthController {
     
     @PostMapping("/register")
     public ResponseEntity<AuthResponse> register(@RequestBody RegisterRequest request) {
-        User user = new User(
-            request.getUsername(),
-            request.getEmail(),
-            request.getPassword()
-            // Role is set to "USER" by default in constructor
-        );
+        // Create User object from request
+        User user = new User();
+        user.setUsername(request.getUsername());
+        user.setEmail(request.getEmail());
+        user.setPassword(request.getPassword());
         
+        // Register user
         User savedUser = authService.register(user);
         
+        // Create response
         AuthResponse response = new AuthResponse();
         response.setId(savedUser.getId());
         response.setUsername(savedUser.getUsername());
@@ -40,8 +41,10 @@ public class AuthController {
     
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest request) {
+        // Authenticate user
         User user = authService.authenticate(request.getUsername(), request.getPassword());
         
+        // Create response
         AuthResponse response = new AuthResponse();
         response.setId(user.getId());
         response.setUsername(user.getUsername());
@@ -54,8 +57,10 @@ public class AuthController {
     
     @PostMapping("/token")
     public ResponseEntity<AuthResponse> getToken(@RequestBody AuthRequest request) {
+        // Generate token for user
         String token = authService.generateToken(request.getUsername());
         
+        // Create response
         AuthResponse response = new AuthResponse();
         response.setToken(token);
         response.setUsername(request.getUsername());
