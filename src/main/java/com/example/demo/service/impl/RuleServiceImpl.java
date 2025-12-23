@@ -111,6 +111,18 @@ public class RuleServiceImpl implements RuleService {
     
     @Override
     public List<InteractionRule> getRulesByMedicationId(Long medicationId) {
-        return ruleRepository.findByMedicationId(medicationId);  // FIXED: Changed method name
+        return ruleRepository.findByMedicationId(medicationId);
+    }
+    
+    // Add this missing method
+    @Override
+    public List<InteractionRule> getRulesBySeverity(String severity) {
+        return ruleRepository.findBySeverityIgnoreCase(severity);
+    }
+    
+    // Also add getRulesByIngredientId if it's in your interface
+    @Override
+    public List<InteractionRule> getRulesByIngredientId(Long ingredientId) {
+        return ruleRepository.findByIngredientId(ingredientId);
     }
 }
