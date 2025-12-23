@@ -77,11 +77,8 @@ public class RuleServiceImpl implements RuleService {
     }
     
     @Override
-    public Optional<InteractionRule> getRuleBetweenIngredients(Long ingredientId1, Long ingredientId2) {
-        List<InteractionRule> rules = ruleRepository.findRuleBetweenIngredients(ingredientId1, ingredientId2);
-        if (rules != null && !rules.isEmpty()) {
-            return Optional.of(rules.get(0));
-        }
-        return Optional.empty();
+    public List<InteractionRule> getRuleBetweenIngredients(Long ingredientId1, Long ingredientId2) {
+        // Now this correctly returns List<InteractionRule>
+        return ruleRepository.findRuleBetweenIngredients(ingredientId1, ingredientId2);
     }
 }
