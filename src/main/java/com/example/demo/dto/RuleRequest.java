@@ -4,12 +4,21 @@ public class RuleRequest {
     private Long ingredientAId;
     private Long ingredientBId;
     private String interactionType;
-    private String severity;
-    private String description;
+    private String severity;  // This should contain "MAJOR", "MODERATE", etc.
+    private String description;  // This should contain the description text
+    
+    // Add recommendation field if needed by tests
     private String recommendation;
     
     // Constructors
     public RuleRequest() {}
+    
+    public RuleRequest(Long ingredientAId, Long ingredientBId, String severity, String description) {
+        this.ingredientAId = ingredientAId;
+        this.ingredientBId = ingredientBId;
+        this.severity = severity;
+        this.description = description;
+    }
     
     public RuleRequest(Long ingredientAId, Long ingredientBId, String interactionType, 
                       String severity, String description, String recommendation) {

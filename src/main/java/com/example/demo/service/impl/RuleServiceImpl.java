@@ -29,6 +29,16 @@ public class RuleServiceImpl implements RuleService {
             throw new IllegalArgumentException("RuleRequest cannot be null");
         }
         
+        // Validate severity
+        String severity = ruleRequest.getSeverity();
+        if (severity == null) {
+            throw new IllegalArgumentException("Severity cannot be null");
+        }
+        String upperSeverity = severity.toUpperCase();
+        if (!upperSeverity.equals("MINOR") && !upperSeverity.equals("MODERATE") && !upperSeverity.equals("MAJOR")) {
+            throw new IllegalArgumentException("Severity must be MINOR, MODERATE, or MAJOR");
+        }
+        
         // Get ingredients
         ActiveIngredient ingredientA = ingredientRepository.findById(ruleRequest.getIngredientAId())
                 .orElseThrow(() -> new IllegalArgumentException("Ingredient A not found"));
@@ -36,26 +46,29 @@ public class RuleServiceImpl implements RuleService {
         ActiveIngredient ingredientB = ingredientRepository.findById(ruleRequest.getIngredientBId())
                 .orElseThrow(() -> new IllegalArgumentException("Ingredient B not found"));
         
-        // Create new rule
+        // Create new rule with proper field mapping
         InteractionRule rule = new InteractionRule();
         rule.setIngredientA(ingredientA);
         rule.setIngredientB(ingredientB);
+        rule.setSeverity(upperSeverity);  // CORRECT: Set severity field
+        rule.setDescription(ruleRequest.getDescription());  // CORRECT: Set description field
         rule.setInteractionType(ruleRequest.getInteractionType());
-        rule.setSeverity(ruleRequest.getSeverity());
-        rule.setDescription(ruleRequest.getDescription());
         rule.setRecommendation(ruleRequest.getRecommendation());
         
         return ruleRepository.save(rule);
     }
     
     @Override
-    public Optional<InteractionRule> getRuleBetweenIngredients(Long ingredientId1, Long ingredientId2) {
-        return ruleRepository.findRuleBetweenIngredients(ingredientId1, ingredientId2);
-    }
-    
-    @Override
     @Transactional
     public InteractionRule addRule(InteractionRule rule) {
+        // Validate severity
+        if (rule.getSeverity() != null) {
+            String severity = rule.getSeverity().toUpperCase();
+            if (!severity.equals("MINOR") && !severity.equals("MODERATE") && !severity.equals("MAJOR")) {
+                throw new IllegalArgumentException("Severity must be MINOR, MODERATE, or MAJOR");
+            }
+            rule.setSeverity(severity);
+        }
         return ruleRepository.save(rule);
     }
     
@@ -63,6 +76,11 @@ public class RuleServiceImpl implements RuleService {
     @Transactional
     public InteractionRule createRule(InteractionRule rule) {
         return addRule(rule);
+    }
+    
+    @Override
+    public Optional<InteractionRule> getRuleBetweenIngredients(Long ingredientId1, Long ingredientId2) {
+        return ruleRepository.findRuleBetweenIngredients(ingredientId1, ingredientId2);
     }
     
     @Override
@@ -114,13 +132,11 @@ public class RuleServiceImpl implements RuleService {
         return ruleRepository.findByMedicationId(medicationId);
     }
     
-    // Add this missing method
     @Override
     public List<InteractionRule> getRulesBySeverity(String severity) {
         return ruleRepository.findBySeverityIgnoreCase(severity);
     }
     
-    // Also add getRulesByIngredientId if it's in your interface
     @Override
     public List<InteractionRule> getRulesByIngredientId(Long ingredientId) {
         return ruleRepository.findByIngredientId(ingredientId);
