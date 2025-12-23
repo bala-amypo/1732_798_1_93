@@ -7,8 +7,8 @@ import com.example.demo.repository.ActiveIngredientRepository;
 import com.example.demo.repository.InteractionRuleRepository;
 import com.example.demo.service.RuleService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class RuleServiceImpl implements RuleService {
@@ -23,28 +23,33 @@ public class RuleServiceImpl implements RuleService {
     }
     
     @Override
-    public InteractionRule addRule(RuleRequest request) {
-        Optional<InteractionRule> existingRule1 = ruleRepository.findByIngredients(
-            request.getIngredientAId(), request.getIngredientBId());
-        
-        Optional<InteractionRule> existingRule2 = ruleRepository.findByIngredients(
-            request.getIngredientBId(), request.getIngredientAId());
-        
-        if (existingRule1.isPresent() || existingRule2.isPresent()) {
-            throw new IllegalArgumentException("Rule already exists between these ingredients");
+    @Transactional
+    public InteractionRule addRule(RuleRequest ruleRequest) {
+        // Validate severity
+        String severity = ruleRequest.getSeverity().toUpperCase();
+        if (!severity.equals("MINOR") && !severity.equals("MODERATE") && !severity.equals("MAJOR")) {
+            throw new IllegalArgumentException("Severity must be MINOR, MODERATE, or MAJOR");
         }
         
-        ActiveIngredient ingredientA = ingredientRepository.findById(request.getIngredientAId())
-            .orElseThrow(() -> new IllegalArgumentException("Ingredient A not found"));
+        // Get ingredients
+        ActiveIngredient ingredientA = ingredientRepository.findById(ruleRequest.getIngredientAId())
+                .orElseThrow(() -> new IllegalArgumentException("Ingredient A not found"));
         
-        ActiveIngredient ingredientB = ingredientRepository.findById(request.getIngredientBId())
-            .orElseThrow(() -> new IllegalArgumentException("Ingredient B not found"));
+        ActiveIngredient ingredientB = ingredientRepository.findById(ruleRequest.getIngredientBId())
+                .orElseThrow(() -> new IllegalArgumentException("Ingredient B not found"));
         
+        // Check if rule already exists
+        if (ruleRepository.existsByIngredients(ingredientA.getId(), ingredientB.getId())) {
+            throw new IllegalArgumentException("Interaction rule already exists for these ingredients");
+        }
+        
+        // Create and save rule
         InteractionRule rule = new InteractionRule();
         rule.setIngredientA(ingredientA);
         rule.setIngredientB(ingredientB);
-        rule.setSeverity(request.getSeverity().toUpperCase());
-        rule.setDescription(request.getDescription());
+        rule.setSeverity(severity);
+        rule.setDescription(ruleRequest.getDescription());
+        rule.setActive(true);
         
         return ruleRepository.save(rule);
     }
@@ -57,37 +62,11 @@ public class RuleServiceImpl implements RuleService {
     @Override
     public InteractionRule getRuleById(Long id) {
         return ruleRepository.findById(id)
-            .orElseThrow(() -> new IllegalArgumentException("Rule not found with id: " + id));
+                .orElseThrow(() -> new IllegalArgumentException("Rule not found with id: " + id));
     }
     
     @Override
     public void deleteRule(Long id) {
         ruleRepository.deleteById(id);
-    }
-    
-    @Override
-    public InteractionRule updateRule(Long id, RuleRequest request) {
-        InteractionRule existingRule = getRuleById(id);
-        
-        if (request.getIngredientAId() != null && request.getIngredientBId() != null) {
-            ActiveIngredient ingredientA = ingredientRepository.findById(request.getIngredientAId())
-                .orElseThrow(() -> new IllegalArgumentException("Ingredient A not found"));
-            
-            ActiveIngredient ingredientB = ingredientRepository.findById(request.getIngredientBId())
-                .orElseThrow(() -> new IllegalArgumentException("Ingredient B not found"));
-            
-            existingRule.setIngredientA(ingredientA);
-            existingRule.setIngredientB(ingredientB);
-        }
-        
-        if (request.getSeverity() != null) {
-            existingRule.setSeverity(request.getSeverity().toUpperCase());
-        }
-        
-        if (request.getDescription() != null) {
-            existingRule.setDescription(request.getDescription());
-        }
-        
-        return ruleRepository.save(existingRule);
     }
 }

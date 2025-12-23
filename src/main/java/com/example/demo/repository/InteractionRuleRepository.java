@@ -12,14 +12,21 @@ import java.util.Optional;
 @Repository
 public interface InteractionRuleRepository extends JpaRepository<InteractionRule, Long> {
     
-    // Find interaction between two specific ingredients
+    // Renamed from findByIngredients to findRuleBetweenIngredients
+    @Query("SELECT r FROM InteractionRule r WHERE " +
+           "(r.ingredientA.id = :ingredientId1 AND r.ingredientB.id = :ingredientId2) OR " +
+           "(r.ingredientA.id = :ingredientId2 AND r.ingredientB.id = :ingredientId1)")
+    Optional<InteractionRule> findRuleBetweenIngredients(@Param("ingredientId1") Long ingredientId1, 
+                                                        @Param("ingredientId2") Long ingredientId2);
+    
+    // Keep the old method for backward compatibility
     @Query("SELECT r FROM InteractionRule r WHERE " +
            "(r.ingredientA.id = :ingredientId1 AND r.ingredientB.id = :ingredientId2) OR " +
            "(r.ingredientA.id = :ingredientId2 AND r.ingredientB.id = :ingredientId1)")
     Optional<InteractionRule> findByIngredients(@Param("ingredientId1") Long ingredientId1, 
                                                @Param("ingredientId2") Long ingredientId2);
     
-    // Find all interactions for a specific ingredient - FIX THIS METHOD
+    // Find all interactions for a specific ingredient
     @Query("SELECT r FROM InteractionRule r WHERE " +
            "r.ingredientA.id = :ingredientId OR r.ingredientB.id = :ingredientId")
     List<InteractionRule> findByIngredientId(@Param("ingredientId") Long ingredientId);
