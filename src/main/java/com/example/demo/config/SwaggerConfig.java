@@ -15,7 +15,7 @@ public class SwaggerConfig {
         return new OpenAPI()
                 .servers(List.of(
                         new Server()
-                                .url("https://9134.408procr.amypo.ai")
+                                .url("https://9272.408procr.amypo.ai")
                                 .description("Production Server")
                 ))
                 .info(new Info()
