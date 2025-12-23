@@ -32,36 +32,77 @@ public class RuleServiceImpl implements RuleService {
         this.ingredientRepository = ingredientRepository;
     }
     
+    // REQUIRED: Add rule with RuleRequest
     @Override
     @Transactional
     public InteractionRule addRule(RuleRequest ruleRequest) {
-        // Your implementation...
-        // Make sure it uses findRuleBetweenIngredients which returns Optional
-        if (ruleRepository != null && ruleRequest != null) {
+        if (ruleRequest == null) {
+            throw new IllegalArgumentException("RuleRequest cannot be null");
+        }
+        
+        // Validate severity
+        String severity = ruleRequest.getSeverity().toUpperCase();
+        if (!severity.equals("MINOR") && !severity.equals("MODERATE") && !severity.equals("MAJOR")) {
+            throw new IllegalArgumentException("Severity must be MINOR, MODERATE, or MAJOR");
+        }
+        
+        // Check if rule already exists
+        if (ruleRepository != null) {
             Optional<InteractionRule> existingRule = ruleRepository.findRuleBetweenIngredients(
                 ruleRequest.getIngredientAId(), ruleRequest.getIngredientBId());
             if (existingRule.isPresent()) {
-                throw new IllegalArgumentException("Rule already exists");
+                throw new IllegalArgumentException("Interaction rule already exists for these ingredients");
             }
         }
         
-        // Rest of your implementation...
+        // Get ingredients if repositories are available
+        ActiveIngredient ingredientA = null;
+        ActiveIngredient ingredientB = null;
+        
+        if (ingredientRepository != null) {
+            ingredientA = ingredientRepository.findById(ruleRequest.getIngredientAId())
+                    .orElseThrow(() -> new IllegalArgumentException("Ingredient A not found"));
+            
+            ingredientB = ingredientRepository.findById(ruleRequest.getIngredientBId())
+                    .orElseThrow(() -> new IllegalArgumentException("Ingredient B not found"));
+        }
+        
+        // Create rule
         InteractionRule rule = new InteractionRule();
-        // Set properties...
+        
+        if (ingredientA != null) {
+            rule.setIngredientA(ingredientA);
+        }
+        if (ingredientB != null) {
+            rule.setIngredientB(ingredientB);
+        }
+        
+        rule.setSeverity(severity);
+        rule.setDescription(ruleRequest.getDescription());
         
         if (ruleRepository != null) {
             return ruleRepository.save(rule);
         }
-        return rule;
+        return rule; // For testing when repository is null
     }
     
+    // REQUIRED: Get rule between ingredients
+    @Override
+    public Optional<InteractionRule> getRuleBetweenIngredients(Long ingredientId1, Long ingredientId2) {
+        if (ruleRepository == null) {
+            return Optional.empty();
+        }
+        return ruleRepository.findRuleBetweenIngredients(ingredientId1, ingredientId2);
+    }
+    
+    // Alias for addRule with InteractionRule
     @Override
     @Transactional
     public InteractionRule addRule(InteractionRule rule) {
         if (ruleRepository != null) {
             return ruleRepository.save(rule);
         }
-        return rule;
+        return rule; // For testing
     }
     
     @Override
@@ -94,7 +135,18 @@ public class RuleServiceImpl implements RuleService {
         }
         
         return ruleRepository.findById(id).map(rule -> {
-            // Update logic...
+            if (ruleDetails.getIngredientA() != null) {
+                rule.setIngredientA(ruleDetails.getIngredientA());
+            }
+            if (ruleDetails.getIngredientB() != null) {
+                rule.setIngredientB(ruleDetails.getIngredientB());
+            }
+            if (ruleDetails.getSeverity() != null) {
+                rule.setSeverity(ruleDetails.getSeverity());
+            }
+            if (ruleDetails.getDescription() != null) {
+                rule.setDescription(ruleDetails.getDescription());
+            }
             return ruleRepository.save(rule);
         }).orElseThrow(() -> new RuntimeException("Rule not found with id: " + id));
     }
