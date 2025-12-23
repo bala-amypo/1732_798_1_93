@@ -15,7 +15,7 @@ public interface CatalogService {
     void deleteMedication(Long id);
     List<Medication> searchMedications(String keyword);
     
-    // ActiveIngredient methods (if you need them)
+    // ActiveIngredient methods
     List<ActiveIngredient> getAllIngredients();
     Optional<ActiveIngredient> getIngredientById(Long id);
     ActiveIngredient createIngredient(ActiveIngredient ingredient);

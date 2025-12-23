@@ -1,59 +1,89 @@
 package com.example.demo.controller;
 
-import com.example.demo.model.ActiveIngredient;
 import com.example.demo.model.Medication;
+import com.example.demo.model.ActiveIngredient;
 import com.example.demo.service.CatalogService;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
-import java.util.Map;
+import java.util.Optional;
 
 @RestController
-@RequestMapping("/catalog")
-@Tag(name = "Catalog", description = "Medication and ingredient catalog management")
+@RequestMapping("/api/catalog")
 public class CatalogController {
     
-    private final CatalogService catalogService;
+    @Autowired
+    private CatalogService catalogService;
     
-    public CatalogController(CatalogService catalogService) {
-        this.catalogService = catalogService;
-    }
-    
-    @PostMapping("/ingredient")
-    @Operation(summary = "Add a new active ingredient")
-    public ResponseEntity<?> addIngredient(@RequestBody ActiveIngredient ingredient) {
-        try {
-            ActiveIngredient savedIngredient = catalogService.addIngredient(ingredient);
-            return ResponseEntity.ok(savedIngredient);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
-        }
-    }
-    
-    @PostMapping("/medication")
-    @Operation(summary = "Add a new medication")
-    public ResponseEntity<?> addMedication(@RequestBody Medication medication) {
-        try {
-            Medication savedMedication = catalogService.addMedication(medication);
-            return ResponseEntity.ok(savedMedication);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
-        }
-    }
+    // Medication endpoints
     
     @GetMapping("/medications")
-    @Operation(summary = "List all medications")
     public ResponseEntity<List<Medication>> getAllMedications() {
-        List<Medication> medications = catalogService.getAllMedications();
-        return ResponseEntity.ok(medications);
+        return ResponseEntity.ok(catalogService.getAllMedications());
     }
     
+    @GetMapping("/medications/{id}")
+    public ResponseEntity<Medication> getMedicationById(@PathVariable Long id) {
+        Optional<Medication> medication = catalogService.getMedicationById(id);
+        return medication.map(ResponseEntity::ok)
+                        .orElse(ResponseEntity.notFound().build());
+    }
+    
+    @PostMapping("/medications")
+    public ResponseEntity<Medication> createMedication(@RequestBody Medication medication) {
+        return ResponseEntity.ok(catalogService.createMedication(medication));
+    }
+    
+    @PutMapping("/medications/{id}")
+    public ResponseEntity<Medication> updateMedication(@PathVariable Long id, 
+                                                       @RequestBody Medication medicationDetails) {
+        return ResponseEntity.ok(catalogService.updateMedication(id, medicationDetails));
+    }
+    
+    @DeleteMapping("/medications/{id}")
+    public ResponseEntity<Void> deleteMedication(@PathVariable Long id) {
+        catalogService.deleteMedication(id);
+        return ResponseEntity.noContent().build();
+    }
+    
+    @GetMapping("/medications/search")
+    public ResponseEntity<List<Medication>> searchMedications(@RequestParam String keyword) {
+        return ResponseEntity.ok(catalogService.searchMedications(keyword));
+    }
+    
+    // ActiveIngredient endpoints (if CatalogService has these methods)
+    
     @GetMapping("/ingredients")
-    @Operation(summary = "List all ingredients")
     public ResponseEntity<List<ActiveIngredient>> getAllIngredients() {
-        List<ActiveIngredient> ingredients = catalogService.getAllIngredients();
-        return ResponseEntity.ok(ingredients);
+        // If you don't have this method in CatalogService, you'll need to:
+        // 1. Add it to CatalogService interface, OR
+        // 2. Create a separate ActiveIngredientController
+        return ResponseEntity.ok(catalogService.getAllIngredients());
+    }
+    
+    @GetMapping("/ingredients/{id}")
+    public ResponseEntity<ActiveIngredient> getIngredientById(@PathVariable Long id) {
+        Optional<ActiveIngredient> ingredient = catalogService.getIngredientById(id);
+        return ingredient.map(ResponseEntity::ok)
+                        .orElse(ResponseEntity.notFound().build());
+    }
+    
+    @PostMapping("/ingredients")
+    public ResponseEntity<ActiveIngredient> createIngredient(@RequestBody ActiveIngredient ingredient) {
+        return ResponseEntity.ok(catalogService.createIngredient(ingredient));
+    }
+    
+    @PutMapping("/ingredients/{id}")
+    public ResponseEntity<ActiveIngredient> updateIngredient(@PathVariable Long id, 
+                                                            @RequestBody ActiveIngredient ingredientDetails) {
+        return ResponseEntity.ok(catalogService.updateIngredient(id, ingredientDetails));
+    }
+    
+    @DeleteMapping("/ingredients/{id}")
+    public ResponseEntity<Void> deleteIngredient(@PathVariable Long id) {
+        catalogService.deleteIngredient(id);
+        return ResponseEntity.noContent().build();
     }
 }
