@@ -5,9 +5,13 @@ import com.example.demo.model.InteractionRule;
 import java.util.List;
 
 public interface RuleService {
-    InteractionRule addRule(RuleRequest request);
+    // The test expects addRule to return InteractionRule
+    InteractionRule addRule(RuleRequest ruleRequest);
+    
+    // For backward compatibility, also support adding InteractionRule directly
+    InteractionRule addRule(InteractionRule rule);
+    
     List<InteractionRule> getAllRules();
     InteractionRule getRuleById(Long id);
     void deleteRule(Long id);
-    InteractionRule updateRule(Long id, RuleRequest request);
 }

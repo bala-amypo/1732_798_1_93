@@ -39,7 +39,7 @@ public class RuleServiceImpl implements RuleService {
                 .orElseThrow(() -> new IllegalArgumentException("Ingredient B not found"));
         
         // Check if rule already exists
-        if (ruleRepository.existsByIngredients(ingredientA.getId(), ingredientB.getId())) {
+        if (ruleRepository.findRuleBetweenIngredients(ingredientA.getId(), ingredientB.getId()).isPresent()) {
             throw new IllegalArgumentException("Interaction rule already exists for these ingredients");
         }
         
@@ -51,6 +51,13 @@ public class RuleServiceImpl implements RuleService {
         rule.setDescription(ruleRequest.getDescription());
         rule.setActive(true);
         
+        return ruleRepository.save(rule);
+    }
+    
+    @Override
+    @Transactional
+    public InteractionRule addRule(InteractionRule rule) {
+        // For direct InteractionRule addition
         return ruleRepository.save(rule);
     }
     
