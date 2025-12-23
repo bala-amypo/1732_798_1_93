@@ -37,6 +37,11 @@ public class CatalogServiceImpl implements CatalogService {
     }
     
     @Override
+    public Medication addMedication(Medication medication) {
+        return createMedication(medication); // Alias
+    }
+    
+    @Override
     public Medication updateMedication(Long id, Medication medicationDetails) {
         return medicationRepository.findById(id).map(medication -> {
             if (medicationDetails.getName() != null) {
@@ -85,6 +90,11 @@ public class CatalogServiceImpl implements CatalogService {
     @Override
     public ActiveIngredient createIngredient(ActiveIngredient ingredient) {
         return activeIngredientRepository.save(ingredient);
+    }
+    
+    @Override
+    public ActiveIngredient addIngredient(ActiveIngredient ingredient) {
+        return createIngredient(ingredient); // Alias
     }
     
     @Override

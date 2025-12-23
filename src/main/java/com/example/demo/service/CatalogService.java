@@ -11,6 +11,10 @@ public interface CatalogService {
     List<Medication> getAllMedications();
     Optional<Medication> getMedicationById(Long id);
     Medication createMedication(Medication medication);
+    
+    // Add alias method for test compatibility
+    Medication addMedication(Medication medication);
+    
     Medication updateMedication(Long id, Medication medicationDetails);
     void deleteMedication(Long id);
     List<Medication> searchMedications(String keyword);
@@ -19,6 +23,10 @@ public interface CatalogService {
     List<ActiveIngredient> getAllIngredients();
     Optional<ActiveIngredient> getIngredientById(Long id);
     ActiveIngredient createIngredient(ActiveIngredient ingredient);
+    
+    // Add alias method for test compatibility
+    ActiveIngredient addIngredient(ActiveIngredient ingredient);
+    
     ActiveIngredient updateIngredient(Long id, ActiveIngredient ingredientDetails);
     void deleteIngredient(Long id);
 }

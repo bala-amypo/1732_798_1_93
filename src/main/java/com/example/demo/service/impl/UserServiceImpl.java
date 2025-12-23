@@ -35,6 +35,18 @@ public class UserServiceImpl implements UserService {
     }
     
     @Override
+    public Optional<User> findByEmail(String email) {
+        return userRepository.findByEmail(email);
+    }
+    
+    @Override
+    public User register(User user) {
+        // For test compatibility - simple implementation
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        return userRepository.save(user);
+    }
+    
+    @Override
     public User updateUser(Long id, User userDetails) {
         return userRepository.findById(id).map(user -> {
             if (userDetails.getUsername() != null) {

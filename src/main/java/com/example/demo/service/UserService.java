@@ -12,10 +12,15 @@ public interface UserService {
     
     Optional<User> getUserByUsername(String username);
     
+    // Add this method for test compatibility
+    Optional<User> findByEmail(String email);
+    
+    // Add this method for test compatibility
+    User register(User user);
+    
     User updateUser(Long id, User userDetails);
     
     void deleteUser(Long id);
     
-    // Add this method if it's in your interface
     boolean validatePassword(String rawPassword, String encodedPassword);
 }

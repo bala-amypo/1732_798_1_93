@@ -27,8 +27,12 @@ public class RuleServiceImpl implements RuleService {
     
     @Override
     public InteractionRule createRule(InteractionRule rule) {
-        // You can add validation here
         return ruleRepository.save(rule);
+    }
+    
+    @Override
+    public InteractionRule addRule(InteractionRule rule) {
+        return createRule(rule); // Alias
     }
     
     @Override
@@ -69,7 +73,6 @@ public class RuleServiceImpl implements RuleService {
     
     @Override
     public List<InteractionRule> getRulesByMedicationId(Long medicationId) {
-        // Using the repository methods we defined earlier
         return ruleRepository.findByMedicationId(medicationId);
     }
 }
