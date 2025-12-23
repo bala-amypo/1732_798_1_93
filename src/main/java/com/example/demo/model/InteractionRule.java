@@ -17,6 +17,15 @@ public class InteractionRule {
     @Column(name = "medication2_id")
     private Long medication2Id;
     
+    // Add ingredient fields
+    @ManyToOne
+    @JoinColumn(name = "ingredient_a_id")
+    private ActiveIngredient ingredientA;
+    
+    @ManyToOne
+    @JoinColumn(name = "ingredient_b_id")
+    private ActiveIngredient ingredientB;
+    
     @Column(name = "interaction_type")
     private String interactionType;
     
@@ -32,6 +41,18 @@ public class InteractionRule {
     // Constructors
     public InteractionRule() {}
     
+    // Constructor with ingredients
+    public InteractionRule(ActiveIngredient ingredientA, ActiveIngredient ingredientB, 
+                          String interactionType, String severity, String description, String recommendation) {
+        this.ingredientA = ingredientA;
+        this.ingredientB = ingredientB;
+        this.interactionType = interactionType;
+        this.severity = severity;
+        this.description = description;
+        this.recommendation = recommendation;
+    }
+    
+    // Constructor with medication IDs
     public InteractionRule(Long medication1Id, Long medication2Id, String interactionType, 
                           String severity, String description, String recommendation) {
         this.medication1Id = medication1Id;
@@ -51,6 +72,12 @@ public class InteractionRule {
     
     public Long getMedication2Id() { return medication2Id; }
     public void setMedication2Id(Long medication2Id) { this.medication2Id = medication2Id; }
+    
+    public ActiveIngredient getIngredientA() { return ingredientA; }
+    public void setIngredientA(ActiveIngredient ingredientA) { this.ingredientA = ingredientA; }
+    
+    public ActiveIngredient getIngredientB() { return ingredientB; }
+    public void setIngredientB(ActiveIngredient ingredientB) { this.ingredientB = ingredientB; }
     
     public String getInteractionType() { return interactionType; }
     public void setInteractionType(String interactionType) { this.interactionType = interactionType; }

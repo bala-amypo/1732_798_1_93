@@ -32,7 +32,7 @@ public class Medication {
         joinColumns = @JoinColumn(name = "medication_id"),
         inverseJoinColumns = @JoinColumn(name = "ingredient_id")
     )
-    private List<ActiveIngredient> activeIngredients;
+    private List<ActiveIngredient> ingredients;  // Changed from activeIngredients to ingredients
     
     // Constructors
     public Medication() {}
@@ -62,8 +62,8 @@ public class Medication {
     public String getStrength() { return strength; }
     public void setStrength(String strength) { this.strength = strength; }
     
-    public List<ActiveIngredient> getActiveIngredients() { return activeIngredients; }
-    public void setActiveIngredients(List<ActiveIngredient> activeIngredients) { 
-        this.activeIngredients = activeIngredients; 
+    public List<ActiveIngredient> getIngredients() { return ingredients; }  // Changed from getActiveIngredients
+    public void setIngredients(List<ActiveIngredient> ingredients) {  // Changed from setActiveIngredients
+        this.ingredients = ingredients; 
     }
 }
