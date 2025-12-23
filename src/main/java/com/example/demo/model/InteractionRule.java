@@ -34,7 +34,6 @@ public class InteractionRule {
     @Column(name = "recommendation", length = 1000)
     private String recommendation;
     
-    // Add these fields if you need medication-based rules
     @Column(name = "medication1_id")
     private Long medication1Id;
     
@@ -44,13 +43,12 @@ public class InteractionRule {
     // Constructors
     public InteractionRule() {}
     
-    // Constructor for test compatibility (4 parameters)
     public InteractionRule(ActiveIngredient ingredientA, ActiveIngredient ingredientB, 
                           String interactionType, String severity) {
         this.ingredientA = ingredientA;
         this.ingredientB = ingredientB;
         this.interactionType = interactionType;
-        setSeverity(severity);  // Use setter to ensure validation
+        setSeverity(severity);
         this.description = "";
         this.recommendation = "";
     }
@@ -102,7 +100,6 @@ public class InteractionRule {
     public String getRecommendation() { return recommendation; }
     public void setRecommendation(String recommendation) { this.recommendation = recommendation; }
     
-    // Override equals and hashCode for proper comparison
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -118,7 +115,6 @@ public class InteractionRule {
     public int hashCode() {
         Long id1 = ingredientA != null ? ingredientA.getId() : null;
         Long id2 = ingredientB != null ? ingredientB.getId() : null;
-        // Create a symmetric hashcode
         if (id1 == null && id2 == null) return 0;
         if (id1 == null) return id2.hashCode();
         if (id2 == null) return id1.hashCode();

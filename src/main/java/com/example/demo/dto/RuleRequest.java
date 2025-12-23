@@ -1,21 +1,25 @@
 package com.example.demo.dto;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-
 public class RuleRequest {
-    
-    @NotNull(message = "Ingredient A ID is required")
     private Long ingredientAId;
-    
-    @NotNull(message = "Ingredient B ID is required")
     private Long ingredientBId;
-    
-    @NotBlank(message = "Severity is required")
+    private String interactionType;
     private String severity;
-    
-    @NotBlank(message = "Description is required")
     private String description;
+    private String recommendation;
+    
+    // Constructors
+    public RuleRequest() {}
+    
+    public RuleRequest(Long ingredientAId, Long ingredientBId, String interactionType, 
+                      String severity, String description, String recommendation) {
+        this.ingredientAId = ingredientAId;
+        this.ingredientBId = ingredientBId;
+        this.interactionType = interactionType;
+        this.severity = severity;
+        this.description = description;
+        this.recommendation = recommendation;
+    }
     
     // Getters and Setters
     public Long getIngredientAId() { return ingredientAId; }
@@ -24,9 +28,15 @@ public class RuleRequest {
     public Long getIngredientBId() { return ingredientBId; }
     public void setIngredientBId(Long ingredientBId) { this.ingredientBId = ingredientBId; }
     
+    public String getInteractionType() { return interactionType; }
+    public void setInteractionType(String interactionType) { this.interactionType = interactionType; }
+    
     public String getSeverity() { return severity; }
     public void setSeverity(String severity) { this.severity = severity; }
     
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }
+    
+    public String getRecommendation() { return recommendation; }
+    public void setRecommendation(String recommendation) { this.recommendation = recommendation; }
 }
