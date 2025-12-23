@@ -75,4 +75,9 @@ public class RuleServiceImpl implements RuleService {
     public List<InteractionRule> getRulesByMedicationId(Long medicationId) {
         return ruleRepository.findByMedicationId(medicationId);
     }
+    
+    @Override
+    public List<InteractionRule> getRulesBetweenIngredients(Long ingredientId1, Long ingredientId2) {
+        return ruleRepository.findRuleBetweenIngredients(ingredientId1, ingredientId2);
+    }
 }

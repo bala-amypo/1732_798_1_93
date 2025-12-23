@@ -15,4 +15,7 @@ public interface RuleService {
     InteractionRule updateRule(Long id, InteractionRule ruleDetails);
     void deleteRule(Long id);
     List<InteractionRule> getRulesByMedicationId(Long medicationId);
+    
+    // Changed from Optional<InteractionRule> to List<InteractionRule>
+    List<InteractionRule> getRulesBetweenIngredients(Long ingredientId1, Long ingredientId2);
 }
