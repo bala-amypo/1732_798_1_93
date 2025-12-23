@@ -60,4 +60,9 @@ public class InteractionServiceImpl implements InteractionService {
     @Override
     public InteractionCheckResult getResult(Long id) {
         if (resultRepository == null) {
-            throw new IllegalStateException("ResultRepository not
+            throw new IllegalStateException("ResultRepository not initialized");
+        }
+        return resultRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Result not found"));
+    }
+}
