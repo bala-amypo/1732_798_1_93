@@ -16,6 +16,6 @@ public interface RuleService {
     void deleteRule(Long id);
     List<InteractionRule> getRulesByMedicationId(Long medicationId);
     
-    // Changed to return List<InteractionRule> as per test expectations
-    List<InteractionRule> getRulesBetweenIngredients(Long ingredientId1, Long ingredientId2);
+    // Keep the original signature
+    Optional<InteractionRule> getRuleBetweenIngredients(Long ingredientId1, Long ingredientId2);
 }
