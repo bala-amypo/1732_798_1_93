@@ -6,5 +6,5 @@ import java.util.List;
 public interface InteractionService {
     InteractionCheckResult checkInteractions(List<Long> medicationIds);
     InteractionCheckResult getResult(Long id);
-    List<InteractionCheckResult> getAllResults();
+    List<InteractionCheckResult> getAllResults();  // Make sure this method exists
 }

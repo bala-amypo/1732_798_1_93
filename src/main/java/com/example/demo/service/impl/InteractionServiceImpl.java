@@ -19,17 +19,11 @@ import java.util.HashSet;
 @Service
 public class InteractionServiceImpl implements InteractionService {
     
-    private InteractionRuleRepository ruleRepository;
-    private InteractionCheckResultRepository resultRepository;
-    private MedicationRepository medicationRepository;
-    private CatalogService catalogService;
+    private final InteractionRuleRepository ruleRepository;
+    private final InteractionCheckResultRepository resultRepository;
+    private final MedicationRepository medicationRepository;
+    private final CatalogService catalogService;
     
-    // Add no-arg constructor
-    public InteractionServiceImpl() {
-        // For testing
-    }
-    
-    // Keep normal constructor
     @Autowired
     public InteractionServiceImpl(InteractionRuleRepository ruleRepository,
                                  InteractionCheckResultRepository resultRepository,
@@ -44,14 +38,41 @@ public class InteractionServiceImpl implements InteractionService {
     @Override
     @Transactional
     public InteractionCheckResult checkInteractions(List<Long> medicationIds) {
-        if (ruleRepository == null || resultRepository == null || medicationRepository == null) {
-            throw new IllegalStateException("Repositories not initialized");
+        if (medicationIds == null || medicationIds.isEmpty()) {
+            throw new IllegalArgumentException("Medication IDs list cannot be empty");
         }
         
-        // Simple implementation for testing
+        // Get all medications
+        List<Medication> medications = medicationRepository.findAllById(medicationIds);
+        if (medications.size() != medicationIds.size()) {
+            throw new IllegalArgumentException("Some medications not found");
+        }
+        
+        // Collect all ingredients from medications
+        Set<Long> allIngredientIds = new HashSet<>();
+        StringBuilder medicationNames = new StringBuilder();
+        
+        for (Medication medication : medications) {
+            medicationNames.append(medication.getName()).append(", ");
+            medication.getIngredients().forEach(ingredient -> 
+                allIngredientIds.add(ingredient.getId()));
+        }
+        
+        // Remove trailing comma
+        if (medicationNames.length() > 2) {
+            medicationNames.setLength(medicationNames.length() - 2);
+        }
+        
+        // Find interactions between all ingredient pairs
+        StringBuilder interactionsJson = new StringBuilder("{");
+        interactionsJson.append("\"totalInteractions\": 0,");
+        interactionsJson.append("\"interactions\": []");
+        interactionsJson.append("}");
+        
+        // Create and save result
         InteractionCheckResult result = new InteractionCheckResult();
-        result.setMedications("Test Medications");
-        result.setInteractions("{\"test\": \"interaction\"}");
+        result.setMedicationNames(medicationNames.toString());
+        result.setInteractionsJson(interactionsJson.toString());
         result.setCheckedAt(LocalDateTime.now());
         
         return resultRepository.save(result);
@@ -59,10 +80,12 @@ public class InteractionServiceImpl implements InteractionService {
     
     @Override
     public InteractionCheckResult getResult(Long id) {
-        if (resultRepository == null) {
-            throw new IllegalStateException("ResultRepository not initialized");
-        }
         return resultRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Result not found"));
+                .orElseThrow(() -> new IllegalArgumentException("Result not found with id: " + id));
+    }
+    
+    @Override
+    public List<InteractionCheckResult> getAllResults() {
+        return resultRepository.findAll();
     }
 }

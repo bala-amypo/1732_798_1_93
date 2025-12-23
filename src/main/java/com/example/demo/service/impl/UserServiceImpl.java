@@ -6,35 +6,29 @@ import com.example.demo.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class UserServiceImpl implements UserService {
     
-    private UserRepository userRepository;
-    private PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
     
-    // Add a no-arg constructor for testing
-    public UserServiceImpl() {
-        // This constructor is for testing only
-    }
-    
-    // Keep your normal constructor
     @Autowired
     public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
     }
     
-    // Add this method - test calls register(user) not registerUser(user)
+    @Override
+    @Transactional
     public User register(User user) {
         return registerUser(user);
     }
     
     @Override
+    @Transactional
     public User registerUser(User user) {
-        if (userRepository == null) {
-            throw new IllegalStateException("UserRepository not initialized");
-        }
         if (userRepository.existsByEmail(user.getEmail())) {
             throw new IllegalArgumentException("Email already exists");
         }
@@ -49,9 +43,6 @@ public class UserServiceImpl implements UserService {
     
     @Override
     public User findByEmail(String email) {
-        if (userRepository == null) {
-            throw new IllegalStateException("UserRepository not initialized");
-        }
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("User not found with email: " + email));
     }

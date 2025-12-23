@@ -12,5 +12,5 @@ public interface CatalogService {
     ActiveIngredient getIngredientById(Long id);
     Medication getMedicationById(Long id);
     void deleteIngredient(Long id);
-    void deleteMedication(Long id);
+    void deleteMedication(Long id);  // Make sure this method exists
 }

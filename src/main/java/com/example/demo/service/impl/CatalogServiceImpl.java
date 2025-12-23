@@ -9,20 +9,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
-import java.util.HashSet;
 
 @Service
 public class CatalogServiceImpl implements CatalogService {
     
-    private ActiveIngredientRepository ingredientRepository;
-    private MedicationRepository medicationRepository;
+    private final ActiveIngredientRepository ingredientRepository;
+    private final MedicationRepository medicationRepository;
     
-    // Add no-arg constructor for testing
-    public CatalogServiceImpl() {
-        // For testing only
-    }
-    
-    // Keep normal constructor
     @Autowired
     public CatalogServiceImpl(ActiveIngredientRepository ingredientRepository, 
                              MedicationRepository medicationRepository) {
@@ -31,10 +24,8 @@ public class CatalogServiceImpl implements CatalogService {
     }
     
     @Override
+    @Transactional
     public ActiveIngredient addIngredient(ActiveIngredient ingredient) {
-        if (ingredientRepository == null) {
-            throw new IllegalStateException("IngredientRepository not initialized");
-        }
         if (ingredientRepository.existsByName(ingredient.getName())) {
             throw new IllegalArgumentException("Ingredient name must be unique");
         }
@@ -44,14 +35,43 @@ public class CatalogServiceImpl implements CatalogService {
     @Override
     @Transactional
     public Medication addMedication(Medication medication) {
-        if (medicationRepository == null) {
-            throw new IllegalStateException("MedicationRepository not initialized");
-        }
         if (medication.getIngredients() == null || medication.getIngredients().isEmpty()) {
             throw new IllegalArgumentException("Medication must include at least one ingredient");
         }
         return medicationRepository.save(medication);
     }
     
-    // Keep your other methods...
+    @Override
+    public List<Medication> getAllMedications() {
+        return medicationRepository.findAll();
+    }
+    
+    @Override
+    public List<ActiveIngredient> getAllIngredients() {
+        return ingredientRepository.findAll();
+    }
+    
+    @Override
+    public ActiveIngredient getIngredientById(Long id) {
+        return ingredientRepository.findById(id)
+            .orElseThrow(() -> new IllegalArgumentException("Ingredient not found with id: " + id));
+    }
+    
+    @Override
+    public Medication getMedicationById(Long id) {
+        return medicationRepository.findById(id)
+            .orElseThrow(() -> new IllegalArgumentException("Medication not found with id: " + id));
+    }
+    
+    @Override
+    @Transactional
+    public void deleteIngredient(Long id) {
+        ingredientRepository.deleteById(id);
+    }
+    
+    @Override
+    @Transactional
+    public void deleteMedication(Long id) {
+        medicationRepository.deleteById(id);
+    }
 }

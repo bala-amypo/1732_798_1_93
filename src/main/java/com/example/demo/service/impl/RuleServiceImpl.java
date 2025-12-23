@@ -14,15 +14,9 @@ import java.util.List;
 @Service
 public class RuleServiceImpl implements RuleService {
     
-    private InteractionRuleRepository ruleRepository;
-    private ActiveIngredientRepository ingredientRepository;
+    private final InteractionRuleRepository ruleRepository;
+    private final ActiveIngredientRepository ingredientRepository;
     
-    // Add no-arg constructor
-    public RuleServiceImpl() {
-        // For testing
-    }
-    
-    // Keep normal constructor
     @Autowired
     public RuleServiceImpl(InteractionRuleRepository ruleRepository,
                           ActiveIngredientRepository ingredientRepository) {
@@ -30,37 +24,52 @@ public class RuleServiceImpl implements RuleService {
         this.ingredientRepository = ingredientRepository;
     }
     
-    // Test expects addRule that returns InteractionRule, not void
     @Override
     @Transactional
     public InteractionRule addRule(RuleRequest ruleRequest) {
-        if (ruleRepository == null || ingredientRepository == null) {
-            throw new IllegalStateException("Repositories not initialized");
+        // Validate severity
+        String severity = ruleRequest.getSeverity().toUpperCase();
+        if (!severity.equals("MINOR") && !severity.equals("MODERATE") && !severity.equals("MAJOR")) {
+            throw new IllegalArgumentException("Severity must be MINOR, MODERATE, or MAJOR");
         }
         
-        // Your implementation here...
+        // Get ingredients
         ActiveIngredient ingredientA = ingredientRepository.findById(ruleRequest.getIngredientAId())
                 .orElseThrow(() -> new IllegalArgumentException("Ingredient A not found"));
         
         ActiveIngredient ingredientB = ingredientRepository.findById(ruleRequest.getIngredientBId())
                 .orElseThrow(() -> new IllegalArgumentException("Ingredient B not found"));
         
+        // Check if rule already exists
+        if (ruleRepository.findRuleBetweenIngredients(ingredientA.getId(), ingredientB.getId()).isPresent()) {
+            throw new IllegalArgumentException("Interaction rule already exists for these ingredients");
+        }
+        
+        // Create and save rule
         InteractionRule rule = new InteractionRule();
         rule.setIngredientA(ingredientA);
         rule.setIngredientB(ingredientB);
-        rule.setSeverity(ruleRequest.getSeverity());
+        rule.setSeverity(severity);
         rule.setDescription(ruleRequest.getDescription());
+        rule.setActive(true);
         
         return ruleRepository.save(rule);
     }
     
-    // Also add method that accepts InteractionRule directly (for test)
-    public InteractionRule addRule(InteractionRule rule) {
-        if (ruleRepository == null) {
-            throw new IllegalStateException("RuleRepository not initialized");
-        }
-        return ruleRepository.save(rule);
+    @Override
+    public List<InteractionRule> getAllRules() {
+        return ruleRepository.findAll();
     }
     
-    // Keep other methods...
+    @Override
+    public InteractionRule getRuleById(Long id) {
+        return ruleRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Rule not found with id: " + id));
+    }
+    
+    @Override
+    @Transactional
+    public void deleteRule(Long id) {
+        ruleRepository.deleteById(id);
+    }
 }
