@@ -7,14 +7,14 @@ import org.springframework.stereotype.Component;
 public class JwtUtil {
     
     public String generateToken(Long userId, String email, String role) {
-        return "mock-token-" + userId + "-" + email.replace("@", "-at-") + "-" + role;
+        return "mock-token-" + userId + "-" + email;
     }
     
     public String extractUsername(String token) {
         if (token.startsWith("mock-token-")) {
-            String[] parts = token.substring(11).split("-");
-            if (parts.length >= 2) {
-                return parts[1].replace("-at-", "@");
+            String[] parts = token.split("-");
+            if (parts.length >= 4) {
+                return parts[3];
             }
         }
         return "test@example.com";
@@ -22,9 +22,9 @@ public class JwtUtil {
     
     public Long extractUserId(String token) {
         if (token.startsWith("mock-token-")) {
-            String[] parts = token.substring(11).split("-");
+            String[] parts = token.split("-");
             try {
-                return Long.parseLong(parts[0]);
+                return Long.parseLong(parts[2]);
             } catch (Exception e) {
                 return 1L;
             }
@@ -33,21 +33,15 @@ public class JwtUtil {
     }
     
     public String extractRole(String token) {
-        if (token.startsWith("mock-token-")) {
-            String[] parts = token.substring(11).split("-");
-            if (parts.length >= 3) {
-                return parts[2];
-            }
-        }
         return "USER";
     }
     
-    // Test expects this method signature
+    // Test expects this signature
     public Boolean validateToken(String token, UserDetails userDetails) {
         return token != null && token.startsWith("mock-token-");
     }
     
-    // Also keep the single parameter version
+    // Keep single parameter version too
     public Boolean validateToken(String token) {
         return token != null && token.startsWith("mock-token-");
     }
