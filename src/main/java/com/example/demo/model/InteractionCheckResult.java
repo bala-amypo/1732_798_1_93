@@ -6,64 +6,59 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "interaction_check_results")
 public class InteractionCheckResult {
-    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
-    @Column(name = "medication_names")
-    private String medicationNames;
+    @Column(name = "medications")
+    private String medications;
     
-    @Column(name = "interaction_details")
-    private String interactionDetails;
+    @Column(name = "interactions", columnDefinition = "TEXT")
+    private String interactions;
     
-    @Column(name = "has_interaction")
-    private boolean hasInteraction;
-    
+    @Column(name = "checked_at")
     private LocalDateTime checkedAt;
     
     // Constructors
     public InteractionCheckResult() {
-        this.checkedAt = LocalDateTime.now();
     }
     
-    // Add this constructor for test compatibility (2 parameters)
-    public InteractionCheckResult(String medicationNames, String interactions) {
-        this.medicationNames = medicationNames;
-        this.interactionDetails = interactions;
-        this.hasInteraction = true;
-        this.checkedAt = LocalDateTime.now();
-    }
-    
-    public InteractionCheckResult(String medicationNames, String interactionDetails, boolean hasInteraction) {
-        this.medicationNames = medicationNames;
-        this.interactionDetails = interactionDetails;
-        this.hasInteraction = hasInteraction;
+    public InteractionCheckResult(String medications, String interactions) {
+        this.medications = medications;
+        this.interactions = interactions;
         this.checkedAt = LocalDateTime.now();
     }
     
     // Getters and Setters
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    public Long getId() {
+        return id;
+    }
     
-    public String getMedicationNames() { return medicationNames; }
-    public void setMedicationNames(String medicationNames) { this.medicationNames = medicationNames; }
+    public void setId(Long id) {
+        this.id = id;
+    }
     
-    public String getInteractionDetails() { return interactionDetails; }
-    public void setInteractionDetails(String interactionDetails) { this.interactionDetails = interactionDetails; }
+    public String getMedications() {
+        return medications;
+    }
     
-    // Add alias methods for test compatibility
+    public void setMedications(String medications) {
+        this.medications = medications;
+    }
+    
     public String getInteractions() {
-        return this.interactionDetails;
+        return interactions;
     }
     
     public void setInteractions(String interactions) {
-        this.interactionDetails = interactions;
+        this.interactions = interactions;
     }
     
-    public boolean isHasInteraction() { return hasInteraction; }
-    public void setHasInteraction(boolean hasInteraction) { this.hasInteraction = hasInteraction; }
+    public LocalDateTime getCheckedAt() {
+        return checkedAt;
+    }
     
-    public LocalDateTime getCheckedAt() { return checkedAt; }
-    public void setCheckedAt(LocalDateTime checkedAt) { this.checkedAt = checkedAt; }
+    public void setCheckedAt(LocalDateTime checkedAt) {
+        this.checkedAt = checkedAt;
+    }
 }
