@@ -43,24 +43,26 @@ public class InteractionRule {
     // Constructors
     public InteractionRule() {}
     
+    // Constructor for testing (4 parameters)
     public InteractionRule(ActiveIngredient ingredientA, ActiveIngredient ingredientB, 
-                          String interactionType, String severity) {
+                          String severity, String description) {  // Changed parameter order
         this.ingredientA = ingredientA;
         this.ingredientB = ingredientB;
-        this.interactionType = interactionType;
-        setSeverity(severity);
-        this.description = "";
+        setSeverity(severity);  // Use setter for validation
+        this.description = description != null ? description : "";
+        this.interactionType = "";
         this.recommendation = "";
     }
     
+    // Constructor for testing (6 parameters)  
     public InteractionRule(ActiveIngredient ingredientA, ActiveIngredient ingredientB, 
-                          String interactionType, String severity, String description, String recommendation) {
+                          String severity, String description, String interactionType, String recommendation) {
         this.ingredientA = ingredientA;
         this.ingredientB = ingredientB;
-        this.interactionType = interactionType;
         setSeverity(severity);
-        this.description = description;
-        this.recommendation = recommendation;
+        this.description = description != null ? description : "";
+        this.interactionType = interactionType != null ? interactionType : "";
+        this.recommendation = recommendation != null ? recommendation : "";
     }
     
     // Getters and Setters

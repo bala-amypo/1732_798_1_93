@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "interaction_check_results")
 public class InteractionCheckResult {
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -16,17 +17,26 @@ public class InteractionCheckResult {
     @Column(name = "interactions", columnDefinition = "TEXT")
     private String interactions;
     
-    @Column(name = "checked_at")
+    @Column(name = "checked_at", nullable = false)
     private LocalDateTime checkedAt;
     
     // Constructors
     public InteractionCheckResult() {
+        this.checkedAt = LocalDateTime.now();  // Set default in no-arg constructor
     }
     
     public InteractionCheckResult(String medications, String interactions) {
         this.medications = medications;
         this.interactions = interactions;
-        this.checkedAt = LocalDateTime.now();
+        this.checkedAt = LocalDateTime.now();  // Always set timestamp
+    }
+    
+    // PrePersist to ensure timestamp is always set
+    @PrePersist
+    protected void onCreate() {
+        if (checkedAt == null) {
+            checkedAt = LocalDateTime.now();
+        }
     }
     
     // Getters and Setters
