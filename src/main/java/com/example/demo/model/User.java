@@ -11,18 +11,19 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
-    @Column(unique = true, nullable = false)
+    @Column(name = "username", unique = true, nullable = false)
     private String username;
     
-    @Column(unique = true, nullable = false)
+    @Column(name = "email", unique = true, nullable = false)
     private String email;
     
-    @Column(nullable = false)
+    @Column(name = "password", nullable = false)
     private String password;
     
-    @Column(nullable = false)
-    private String role = "USER";  // Default role
+    @Column(name = "role", nullable = false)
+    private String role = "USER";
     
+    @Column(name = "created_at")
     private LocalDateTime createdAt;
     
     // Constructors
@@ -35,14 +36,6 @@ public class User {
         this.email = email;
         this.password = password;
         this.role = "USER";
-        this.createdAt = LocalDateTime.now();
-    }
-    
-    public User(String username, String email, String password, String role) {
-        this.username = username;
-        this.email = email;
-        this.password = password;
-        this.role = role;
         this.createdAt = LocalDateTime.now();
     }
     
