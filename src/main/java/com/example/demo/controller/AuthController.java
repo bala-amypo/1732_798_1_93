@@ -1,68 +1,65 @@
 package com.example.demo.controller;
 
+import com.example.demo.dto.AuthRequest;
+import com.example.demo.dto.AuthResponse;
 import com.example.demo.dto.LoginRequest;
 import com.example.demo.dto.RegisterRequest;
 import com.example.demo.model.User;
 import com.example.demo.service.AuthService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-import java.util.Map;
 
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/api/auth")
 public class AuthController {
     
-    private final AuthService authService;
-    private final PasswordEncoder passwordEncoder;
-    
-    public AuthController(AuthService authService, PasswordEncoder passwordEncoder) {
-        this.authService = authService;
-        this.passwordEncoder = passwordEncoder;
-    }
+    @Autowired
+    private AuthService authService;
     
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
-        try {
-            // Use the correct constructor
-            User user = new User(
-                request.getName(),
-                request.getEmail(),
-                request.getPassword(),
-                request.getRole()  // This can be null, User constructor will handle it
-            );
-            
-            User savedUser = authService.registerUser(user);
-            
-            return ResponseEntity.ok(Map.of(
-                "message", "User registered successfully",
-                "email", savedUser.getEmail(),
-                "id", savedUser.getId(),
-                "role", savedUser.getRole()
-            ));
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
-        }
+    public ResponseEntity<AuthResponse> register(@RequestBody RegisterRequest request) {
+        User user = new User(
+            request.getUsername(),
+            request.getEmail(),
+            request.getPassword()
+            // Role is set to "USER" by default in constructor
+        );
+        
+        User savedUser = authService.register(user);
+        
+        AuthResponse response = new AuthResponse();
+        response.setId(savedUser.getId());
+        response.setUsername(savedUser.getUsername());
+        response.setEmail(savedUser.getEmail());
+        response.setRole(savedUser.getRole());
+        response.setToken(authService.generateToken(savedUser.getUsername()));
+        
+        return ResponseEntity.ok(response);
     }
     
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest request) {
-        try {
-            User user = authService.findByEmail(request.getEmail());
-            
-            // Check password
-            if (passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-                return ResponseEntity.ok(Map.of(
-                    "message", "Login successful",
-                    "email", user.getEmail(),
-                    "role", user.getRole(),
-                    "id", user.getId()
-                ));
-            } else {
-                return ResponseEntity.badRequest().body(Map.of("error", "Invalid password"));
-            }
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(Map.of("error", "Invalid email or password"));
-        }
+    public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest request) {
+        User user = authService.authenticate(request.getUsername(), request.getPassword());
+        
+        AuthResponse response = new AuthResponse();
+        response.setId(user.getId());
+        response.setUsername(user.getUsername());
+        response.setEmail(user.getEmail());
+        response.setRole(user.getRole());
+        response.setToken(authService.generateToken(user.getUsername()));
+        
+        return ResponseEntity.ok(response);
+    }
+    
+    @PostMapping("/token")
+    public ResponseEntity<AuthResponse> getToken(@RequestBody AuthRequest request) {
+        String token = authService.generateToken(request.getUsername());
+        
+        AuthResponse response = new AuthResponse();
+        response.setToken(token);
+        response.setUsername(request.getUsername());
+        
+        return ResponseEntity.ok(response);
     }
 }

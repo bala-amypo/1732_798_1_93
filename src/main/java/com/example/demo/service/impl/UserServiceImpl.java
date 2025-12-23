@@ -6,66 +6,55 @@ import com.example.demo.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserServiceImpl implements UserService {
     
+    @Autowired
     private UserRepository userRepository;
-    private PasswordEncoder passwordEncoder;
-    
-    // NO-ARG CONSTRUCTOR FOR TESTING
-    public UserServiceImpl() {
-    }
     
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder) {
-        this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
+    private PasswordEncoder passwordEncoder;
+    
+    @Override
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
     }
     
     @Override
-    @Transactional
-    public User register(User user) {
-        return registerUser(user);
+    public Optional<User> getUserById(Long id) {
+        return userRepository.findById(id);
     }
     
     @Override
-    @Transactional
-    public User registerUser(User user) {
-        // Null check for testing
-        if (userRepository == null) {
-            // For testing, just return the user
-            return user;
-        }
-        if (userRepository.existsByEmail(user.getEmail())) {
-            throw new IllegalArgumentException("Email already exists");
-        }
-        
-        if (user.getRole() == null || user.getRole().isEmpty()) {
-            user.setRole("USER");
-        }
-        
-        if (passwordEncoder != null) {
-            user.setPassword(passwordEncoder.encode(user.getPassword()));
-        }
-        return userRepository.save(user);
+    public Optional<User> getUserByUsername(String username) {
+        return userRepository.findByUsername(username);
     }
     
     @Override
-    public User findByEmail(String email) {
-        if (userRepository == null) {
-            throw new IllegalStateException("UserRepository not initialized");
-        }
-        return userRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException("User not found with email: " + email));
+    public User updateUser(Long id, User userDetails) {
+        return userRepository.findById(id).map(user -> {
+            if (userDetails.getUsername() != null) {
+                user.setUsername(userDetails.getUsername());
+            }
+            if (userDetails.getEmail() != null) {
+                user.setEmail(userDetails.getEmail());
+            }
+            if (userDetails.getPassword() != null) {
+                user.setPassword(passwordEncoder.encode(userDetails.getPassword()));
+            }
+            if (userDetails.getRole() != null) {
+                user.setRole(userDetails.getRole());
+            }
+            return userRepository.save(user);
+        }).orElseThrow(() -> new RuntimeException("User not found with id: " + id));
     }
     
     @Override
-    public boolean validatePassword(String rawPassword, String encodedPassword) {
-        if (passwordEncoder == null) {
-            return rawPassword.equals(encodedPassword); // Simple check for testing
-        }
-        return passwordEncoder.matches(rawPassword, encodedPassword);
+    public void deleteUser(Long id) {
+        userRepository.deleteById(id);
     }
 }

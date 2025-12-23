@@ -4,7 +4,10 @@ import com.example.demo.model.InteractionCheckResult;
 import java.util.List;
 
 public interface InteractionService {
-    InteractionCheckResult checkInteractions(List<Long> medicationIds);
-    InteractionCheckResult getResult(Long id);
-    List<InteractionCheckResult> getAllResults();  // Make sure this method exists
+    
+    InteractionCheckResult checkInteractions(List<Long> medicationIds);  // Changed from List<String>
+    
+    List<InteractionCheckResult> getAllResults();
+    
+    InteractionCheckResult getResult(Long id);  // Added this method
 }
