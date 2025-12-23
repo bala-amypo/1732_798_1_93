@@ -1,9 +1,45 @@
-package com.example.demo.repository;
+package com.example.demo.model;
 
-import com.example.demo.model.InteractionCheckResult;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+import jakarta.persistence.*;
+import java.time.LocalDateTime;
 
-@Repository
-public interface InteractionCheckResultRepository extends JpaRepository<InteractionCheckResult, Long> {
+@Entity
+@Table(name = "interaction_check_results")
+public class InteractionCheckResult {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    
+    @Column(name = "medications")
+    private String medications;
+    
+    @Column(name = "interactions", columnDefinition = "TEXT")
+    private String interactions;
+    
+    @Column(name = "checked_at")
+    private LocalDateTime checkedAt;
+    
+    // NO-ARG CONSTRUCTOR
+    public InteractionCheckResult() {
+    }
+    
+    // CONSTRUCTOR FOR TESTING
+    public InteractionCheckResult(String medications, String interactions) {
+        this.medications = medications;
+        this.interactions = interactions;
+        this.checkedAt = LocalDateTime.now();
+    }
+    
+    // Getters and Setters
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+    
+    public String getMedications() { return medications; }
+    public void setMedications(String medications) { this.medications = medications; }
+    
+    public String getInteractions() { return interactions; }
+    public void setInteractions(String interactions) { this.interactions = interactions; }
+    
+    public LocalDateTime getCheckedAt() { return checkedAt; }
+    public void setCheckedAt(LocalDateTime checkedAt) { this.checkedAt = checkedAt; }
 }
