@@ -17,9 +17,7 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void configurePathMatch(PathMatchConfigurer configurer) {
-        // ✅ CRITICAL: Enable trailing slash matching
         configurer.setUseTrailingSlashMatch(true);
-        // Disable suffix pattern to avoid .json/.xml issues
         configurer.setUseSuffixPatternMatch(false);
     }
 
@@ -31,7 +29,6 @@ public class WebConfig implements WebMvcConfigurer {
             .allowedHeaders("*");
     }
     
-    // ✅ FIXED: Correct method signature for Spring Boot 2.3+
     @Bean
     public ErrorAttributes errorAttributes() {
         return new DefaultErrorAttributes() {

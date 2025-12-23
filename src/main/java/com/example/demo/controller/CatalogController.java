@@ -13,8 +13,6 @@ import java.util.Map;
 @RestController
 @RequestMapping("/catalog")
 @Tag(name = "Catalog", description = "Medication and ingredient catalog management")
-// REMOVE THIS LINE:
-// @SecurityRequirement(name = "bearerAuth")
 public class CatalogController {
     
     private final CatalogService catalogService;
