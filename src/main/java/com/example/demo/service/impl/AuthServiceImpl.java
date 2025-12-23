@@ -1,6 +1,6 @@
 package com.example.demo.service.impl;
 
-import com.example.demo.config.JwtUtil;
+import com.example.demo.util.JwtUtil;  // CHANGED FROM config TO util
 import com.example.demo.model.User;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.service.AuthService;
@@ -13,7 +13,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
 
 @Service
 public class AuthServiceImpl implements AuthService {
