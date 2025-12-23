@@ -1,34 +1,32 @@
 package com.example.demo.model;
 
 import jakarta.persistence.*;
+import java.util.Objects;
 
 @Entity
-@Table(name = "interaction_rules")
+@Table(name = "interaction_rules", 
+       uniqueConstraints = {
+           @UniqueConstraint(columnNames = {"ingredient_a_id", "ingredient_b_id"})
+       })
 public class InteractionRule {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
-    @Column(name = "medication1_id")
-    private Long medication1Id;
-    
-    @Column(name = "medication2_id")
-    private Long medication2Id;
-    
     @ManyToOne
-    @JoinColumn(name = "ingredient_a_id")
+    @JoinColumn(name = "ingredient_a_id", nullable = false)
     private ActiveIngredient ingredientA;
     
     @ManyToOne
-    @JoinColumn(name = "ingredient_b_id")
+    @JoinColumn(name = "ingredient_b_id", nullable = false)
     private ActiveIngredient ingredientB;
     
     @Column(name = "interaction_type")
     private String interactionType;
     
-    @Column(name = "severity")
-    private String severity;
+    @Column(name = "severity", nullable = false)
+    private String severity;  // Should be "MINOR", "MODERATE", "MAJOR"
     
     @Column(name = "description", length = 1000)
     private String description;
@@ -36,16 +34,23 @@ public class InteractionRule {
     @Column(name = "recommendation", length = 1000)
     private String recommendation;
     
+    // Add these fields if you need medication-based rules
+    @Column(name = "medication1_id")
+    private Long medication1Id;
+    
+    @Column(name = "medication2_id")
+    private Long medication2Id;
+    
     // Constructors
     public InteractionRule() {}
     
-    // Add this constructor for test compatibility (4 parameters)
+    // Constructor for test compatibility (4 parameters)
     public InteractionRule(ActiveIngredient ingredientA, ActiveIngredient ingredientB, 
                           String interactionType, String severity) {
         this.ingredientA = ingredientA;
         this.ingredientB = ingredientB;
         this.interactionType = interactionType;
-        this.severity = severity;
+        setSeverity(severity);  // Use setter to ensure validation
         this.description = "";
         this.recommendation = "";
     }
@@ -55,17 +60,7 @@ public class InteractionRule {
         this.ingredientA = ingredientA;
         this.ingredientB = ingredientB;
         this.interactionType = interactionType;
-        this.severity = severity;
-        this.description = description;
-        this.recommendation = recommendation;
-    }
-    
-    public InteractionRule(Long medication1Id, Long medication2Id, String interactionType, 
-                          String severity, String description, String recommendation) {
-        this.medication1Id = medication1Id;
-        this.medication2Id = medication2Id;
-        this.interactionType = interactionType;
-        this.severity = severity;
+        setSeverity(severity);
         this.description = description;
         this.recommendation = recommendation;
     }
@@ -90,11 +85,43 @@ public class InteractionRule {
     public void setInteractionType(String interactionType) { this.interactionType = interactionType; }
     
     public String getSeverity() { return severity; }
-    public void setSeverity(String severity) { this.severity = severity; }
+    public void setSeverity(String severity) {
+        if (severity != null) {
+            String upperSeverity = severity.toUpperCase();
+            if (upperSeverity.equals("MINOR") || upperSeverity.equals("MODERATE") || upperSeverity.equals("MAJOR")) {
+                this.severity = upperSeverity;
+            } else {
+                throw new IllegalArgumentException("Severity must be MINOR, MODERATE, or MAJOR");
+            }
+        }
+    }
     
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }
     
     public String getRecommendation() { return recommendation; }
     public void setRecommendation(String recommendation) { this.recommendation = recommendation; }
+    
+    // Override equals and hashCode for proper comparison
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        InteractionRule that = (InteractionRule) o;
+        return Objects.equals(ingredientA.getId(), that.ingredientA.getId()) &&
+               Objects.equals(ingredientB.getId(), that.ingredientB.getId()) ||
+               Objects.equals(ingredientA.getId(), that.ingredientB.getId()) &&
+               Objects.equals(ingredientB.getId(), that.ingredientA.getId());
+    }
+    
+    @Override
+    public int hashCode() {
+        Long id1 = ingredientA != null ? ingredientA.getId() : null;
+        Long id2 = ingredientB != null ? ingredientB.getId() : null;
+        // Create a symmetric hashcode
+        if (id1 == null && id2 == null) return 0;
+        if (id1 == null) return id2.hashCode();
+        if (id2 == null) return id1.hashCode();
+        return id1.hashCode() ^ id2.hashCode();
+    }
 }
