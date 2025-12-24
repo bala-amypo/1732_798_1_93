@@ -1,70 +1,63 @@
 package com.example.demo.controller;
 
-import com.example.demo.dto.AuthRequest;
-import com.example.demo.dto.AuthResponse;
-import com.example.demo.dto.LoginRequest;
-import com.example.demo.dto.RegisterRequest;
 import com.example.demo.model.User;
-import com.example.demo.service.AuthService;
+import com.example.demo.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
+@CrossOrigin(origins = "*")
 public class AuthController {
     
     @Autowired
-    private AuthService authService;
+    private UserService userService;
+    
+    @Autowired
+    private PasswordEncoder passwordEncoder;
     
     @PostMapping("/register")
-    public ResponseEntity<AuthResponse> register(@RequestBody RegisterRequest request) {
-        // Create User object from request
-        User user = new User();
-        user.setUsername(request.getUsername());
-        user.setEmail(request.getEmail());
-        user.setPassword(request.getPassword());
+    public ResponseEntity<Map<String, Object>> register(@RequestBody Map<String, String> request) {
+        Map<String, Object> response = new HashMap<>();
         
-        // Register user
-        User savedUser = authService.register(user);
-        
-        // Create response
-        AuthResponse response = new AuthResponse();
-        response.setId(savedUser.getId());
-        response.setUsername(savedUser.getUsername());
-        response.setEmail(savedUser.getEmail());
-        response.setRole(savedUser.getRole());
-        response.setToken(authService.generateToken(savedUser.getUsername()));
-        
-        return ResponseEntity.ok(response);
+        try {
+            String username = request.get("username");
+            String email = request.get("email");
+            String password = request.get("password");
+            
+            if (username == null || email == null || password == null) {
+                response.put("error", "Missing required fields");
+                return ResponseEntity.badRequest().body(response);
+            }
+            
+            // Create simple user
+            User user = new User();
+            user.setUsername(username);
+            user.setEmail(email);
+            user.setPassword(passwordEncoder.encode(password));
+            
+            User savedUser = userService.save(user);
+            
+            response.put("status", "success");
+            response.put("message", "User created successfully");
+            response.put("userId", savedUser.getId());
+            response.put("username", savedUser.getUsername());
+            
+            return ResponseEntity.ok(response);
+            
+        } catch (Exception e) {
+            response.put("error", "Registration failed: " + e.getMessage());
+            return ResponseEntity.internalServerError().body(response);
+        }
     }
     
-    @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest request) {
-        // Authenticate user
-        User user = authService.authenticate(request.getUsername(), request.getPassword());
-        
-        // Create response
-        AuthResponse response = new AuthResponse();
-        response.setId(user.getId());
-        response.setUsername(user.getUsername());
-        response.setEmail(user.getEmail());
-        response.setRole(user.getRole());
-        response.setToken(authService.generateToken(user.getUsername()));
-        
-        return ResponseEntity.ok(response);
-    }
-    
-    @PostMapping("/token")
-    public ResponseEntity<AuthResponse> getToken(@RequestBody AuthRequest request) {
-        // Generate token for user
-        String token = authService.generateToken(request.getUsername());
-        
-        // Create response
-        AuthResponse response = new AuthResponse();
-        response.setToken(token);
-        response.setUsername(request.getUsername());
-        
-        return ResponseEntity.ok(response);
+    @GetMapping("/status")
+    public String status() {
+        return "Auth endpoints are available";
     }
 }
