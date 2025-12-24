@@ -19,5 +19,3 @@ public class SwaggerConfig {
         }
 }
 
-curl -v "https://9272.pro604cr.amypo.ai/api/auth/register" -H "*/*" -H "Content-Type: application/json" -d '{
-"username":  "abc","email": "abc@gmail.com","password": "abc123" }'
