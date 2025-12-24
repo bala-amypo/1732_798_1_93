@@ -34,10 +34,6 @@ public class RuleServiceImpl implements RuleService {
         if (severity == null) {
             throw new IllegalArgumentException("Severity cannot be null");
         }
-        String upperSeverity = severity.toUpperCase();
-        if (!upperSeverity.equals("MINOR") && !upperSeverity.equals("MODERATE") && !upperSeverity.equals("MAJOR")) {
-            throw new IllegalArgumentException("Severity must be MINOR, MODERATE, or MAJOR");
-        }
         
         // Get ingredients
         ActiveIngredient ingredientA = ingredientRepository.findById(ruleRequest.getIngredientAId())
@@ -46,16 +42,21 @@ public class RuleServiceImpl implements RuleService {
         ActiveIngredient ingredientB = ingredientRepository.findById(ruleRequest.getIngredientBId())
                 .orElseThrow(() -> new IllegalArgumentException("Ingredient B not found"));
         
-        // Create new rule with proper field mapping
+        // Create new rule
         InteractionRule rule = new InteractionRule();
         rule.setIngredientA(ingredientA);
         rule.setIngredientB(ingredientB);
-        rule.setSeverity(upperSeverity);  // CORRECT: Set severity field
-        rule.setDescription(ruleRequest.getDescription());  // CORRECT: Set description field
+        rule.setSeverity(severity.toUpperCase());  // Set severity
+        rule.setDescription(ruleRequest.getDescription());  // Set description
         rule.setInteractionType(ruleRequest.getInteractionType());
         rule.setRecommendation(ruleRequest.getRecommendation());
         
         return ruleRepository.save(rule);
+    }
+    
+    @Override
+    public Optional<InteractionRule> getRuleBetweenIngredients(Long ingredientId1, Long ingredientId2) {
+        return ruleRepository.findRuleBetweenIngredients(ingredientId1, ingredientId2);
     }
     
     @Override
@@ -76,11 +77,6 @@ public class RuleServiceImpl implements RuleService {
     @Transactional
     public InteractionRule createRule(InteractionRule rule) {
         return addRule(rule);
-    }
-    
-    @Override
-    public Optional<InteractionRule> getRuleBetweenIngredients(Long ingredientId1, Long ingredientId2) {
-        return ruleRepository.findRuleBetweenIngredients(ingredientId1, ingredientId2);
     }
     
     @Override

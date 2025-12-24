@@ -4,10 +4,8 @@ public class RuleRequest {
     private Long ingredientAId;
     private Long ingredientBId;
     private String interactionType;
-    private String severity;  // This should contain "MAJOR", "MODERATE", etc.
-    private String description;  // This should contain the description text
-    
-    // Add recommendation field if needed by tests
+    private String severity;
+    private String description;
     private String recommendation;
     
     // Constructors

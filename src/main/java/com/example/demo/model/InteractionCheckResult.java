@@ -18,11 +18,11 @@ public class InteractionCheckResult {
     private String interactions;
     
     @Column(name = "checked_at", nullable = false)
-    private LocalDateTime checkedAt = LocalDateTime.now();  // Initialize here
+    private LocalDateTime checkedAt;
     
-    // Constructors
+    // Constructors - CRITICAL: Always set checkedAt
     public InteractionCheckResult() {
-        this.checkedAt = LocalDateTime.now();  // Also set in constructor
+        this.checkedAt = LocalDateTime.now();  // Always initialize
     }
     
     public InteractionCheckResult(String medications, String interactions) {
@@ -31,7 +31,7 @@ public class InteractionCheckResult {
         this.checkedAt = LocalDateTime.now();  // Always set timestamp
     }
     
-    // PrePersist to ensure timestamp is always set
+    // PrePersist ensures timestamp is set even if somehow missed
     @PrePersist
     protected void onCreate() {
         if (checkedAt == null) {
@@ -65,8 +65,9 @@ public class InteractionCheckResult {
     }
     
     public LocalDateTime getCheckedAt() {
+        // Guarantee non-null return
         if (checkedAt == null) {
-            checkedAt = LocalDateTime.now();  // Lazy initialization if null
+            checkedAt = LocalDateTime.now();
         }
         return checkedAt;
     }
