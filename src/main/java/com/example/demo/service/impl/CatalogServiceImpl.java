@@ -29,6 +29,12 @@ public class CatalogServiceImpl implements CatalogService {
     
     @Override
     @Transactional
+    public Medication createMedication(Medication medication) {
+        return addMedication(medication);  // Alias for addMedication
+    }
+    
+    @Override
+    @Transactional
     public Medication updateMedication(Long id, Medication medicationDetails) {
         Medication medication = medicationRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Medication not found with id: " + id));
@@ -74,9 +80,29 @@ public class CatalogServiceImpl implements CatalogService {
     }
     
     @Override
+    public List<Medication> searchMedications(String query) {
+        // Implement search logic - this is a simple implementation
+        // You might want to implement more sophisticated search
+        if (query == null || query.trim().isEmpty()) {
+            return getAllMedications();
+        }
+        String searchTerm = query.toLowerCase().trim();
+        return medicationRepository.findAll().stream()
+                .filter(m -> m.getName().toLowerCase().contains(searchTerm) ||
+                           (m.getGenericName() != null && m.getGenericName().toLowerCase().contains(searchTerm)))
+                .toList();
+    }
+    
+    @Override
     @Transactional
     public ActiveIngredient addIngredient(ActiveIngredient ingredient) {
         return ingredientRepository.save(ingredient);
+    }
+    
+    @Override
+    @Transactional
+    public ActiveIngredient createIngredient(ActiveIngredient ingredient) {
+        return addIngredient(ingredient);  // Alias for addIngredient
     }
     
     @Override

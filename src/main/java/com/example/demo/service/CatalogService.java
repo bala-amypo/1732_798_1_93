@@ -9,14 +9,17 @@ public interface CatalogService {
     
     // Medication operations
     Medication addMedication(Medication medication);
+    Medication createMedication(Medication medication);  // Add this
     Medication updateMedication(Long id, Medication medicationDetails);
     void deleteMedication(Long id);
     List<Medication> getAllMedications();
     Optional<Medication> getMedicationById(Long id);
     List<Medication> getMedicationsByIngredientId(Long ingredientId);
+    List<Medication> searchMedications(String query);  // Add this
     
     // Ingredient operations
     ActiveIngredient addIngredient(ActiveIngredient ingredient);
+    ActiveIngredient createIngredient(ActiveIngredient ingredient);  // Add this
     ActiveIngredient updateIngredient(Long id, ActiveIngredient ingredientDetails);
     void deleteIngredient(Long id);
     List<ActiveIngredient> getAllIngredients();

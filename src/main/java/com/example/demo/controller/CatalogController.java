@@ -1,7 +1,7 @@
 package com.example.demo.controller;
 
-import com.example.demo.model.Medication;
 import com.example.demo.model.ActiveIngredient;
+import com.example.demo.model.Medication;
 import com.example.demo.service.CatalogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -12,34 +12,46 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/catalog")
+@CrossOrigin(origins = "*")
 public class CatalogController {
     
     @Autowired
     private CatalogService catalogService;
     
     // Medication endpoints
+    @PostMapping("/medications")
+    public ResponseEntity<Medication> createMedication(@RequestBody Medication medication) {
+        Medication created = catalogService.createMedication(medication);  // Use createMedication
+        return ResponseEntity.ok(created);
+    }
     
     @GetMapping("/medications")
     public ResponseEntity<List<Medication>> getAllMedications() {
-        return ResponseEntity.ok(catalogService.getAllMedications());
+        List<Medication> medications = catalogService.getAllMedications();
+        return ResponseEntity.ok(medications);
+    }
+    
+    @GetMapping("/medications/search")
+    public ResponseEntity<List<Medication>> searchMedications(@RequestParam(required = false) String query) {
+        List<Medication> medications = catalogService.searchMedications(query);  // Use searchMedications
+        return ResponseEntity.ok(medications);
     }
     
     @GetMapping("/medications/{id}")
     public ResponseEntity<Medication> getMedicationById(@PathVariable Long id) {
         Optional<Medication> medication = catalogService.getMedicationById(id);
         return medication.map(ResponseEntity::ok)
-                        .orElse(ResponseEntity.notFound().build());
-    }
-    
-    @PostMapping("/medications")
-    public ResponseEntity<Medication> createMedication(@RequestBody Medication medication) {
-        return ResponseEntity.ok(catalogService.createMedication(medication));
+                .orElse(ResponseEntity.notFound().build());
     }
     
     @PutMapping("/medications/{id}")
-    public ResponseEntity<Medication> updateMedication(@PathVariable Long id, 
-                                                       @RequestBody Medication medicationDetails) {
-        return ResponseEntity.ok(catalogService.updateMedication(id, medicationDetails));
+    public ResponseEntity<Medication> updateMedication(@PathVariable Long id, @RequestBody Medication medicationDetails) {
+        try {
+            Medication updated = catalogService.updateMedication(id, medicationDetails);
+            return ResponseEntity.ok(updated);
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
     
     @DeleteMapping("/medications/{id}")
@@ -48,42 +60,71 @@ public class CatalogController {
         return ResponseEntity.noContent().build();
     }
     
-    @GetMapping("/medications/search")
-    public ResponseEntity<List<Medication>> searchMedications(@RequestParam String keyword) {
-        return ResponseEntity.ok(catalogService.searchMedications(keyword));
+    // Ingredient endpoints
+    @PostMapping("/ingredients")
+    public ResponseEntity<ActiveIngredient> createIngredient(@RequestBody ActiveIngredient ingredient) {
+        ActiveIngredient created = catalogService.createIngredient(ingredient);  // Use createIngredient
+        return ResponseEntity.ok(created);
     }
-    
-    // ActiveIngredient endpoints (if CatalogService has these methods)
     
     @GetMapping("/ingredients")
     public ResponseEntity<List<ActiveIngredient>> getAllIngredients() {
-        // If you don't have this method in CatalogService, you'll need to:
-        // 1. Add it to CatalogService interface, OR
-        // 2. Create a separate ActiveIngredientController
-        return ResponseEntity.ok(catalogService.getAllIngredients());
+        List<ActiveIngredient> ingredients = catalogService.getAllIngredients();
+        return ResponseEntity.ok(ingredients);
     }
     
     @GetMapping("/ingredients/{id}")
     public ResponseEntity<ActiveIngredient> getIngredientById(@PathVariable Long id) {
         Optional<ActiveIngredient> ingredient = catalogService.getIngredientById(id);
         return ingredient.map(ResponseEntity::ok)
-                        .orElse(ResponseEntity.notFound().build());
+                .orElse(ResponseEntity.notFound().build());
     }
     
-    @PostMapping("/ingredients")
-    public ResponseEntity<ActiveIngredient> createIngredient(@RequestBody ActiveIngredient ingredient) {
-        return ResponseEntity.ok(catalogService.createIngredient(ingredient));
+    @GetMapping("/ingredients/name/{name}")
+    public ResponseEntity<ActiveIngredient> getIngredientByName(@PathVariable String name) {
+        Optional<ActiveIngredient> ingredient = catalogService.getIngredientByName(name);
+        return ingredient.map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
     
     @PutMapping("/ingredients/{id}")
-    public ResponseEntity<ActiveIngredient> updateIngredient(@PathVariable Long id, 
-                                                            @RequestBody ActiveIngredient ingredientDetails) {
-        return ResponseEntity.ok(catalogService.updateIngredient(id, ingredientDetails));
+    public ResponseEntity<ActiveIngredient> updateIngredient(@PathVariable Long id, @RequestBody ActiveIngredient ingredientDetails) {
+        try {
+            ActiveIngredient updated = catalogService.updateIngredient(id, ingredientDetails);
+            return ResponseEntity.ok(updated);
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
     
     @DeleteMapping("/ingredients/{id}")
     public ResponseEntity<Void> deleteIngredient(@PathVariable Long id) {
         catalogService.deleteIngredient(id);
         return ResponseEntity.noContent().build();
+    }
+    
+    // Relationship endpoints
+    @PostMapping("/medications/{medicationId}/ingredients/{ingredientId}")
+    public ResponseEntity<Medication> addIngredientToMedication(
+            @PathVariable Long medicationId, 
+            @PathVariable Long ingredientId) {
+        try {
+            Medication updated = catalogService.addIngredientToMedication(medicationId, ingredientId);
+            return ResponseEntity.ok(updated);
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+    
+    @DeleteMapping("/medications/{medicationId}/ingredients/{ingredientId}")
+    public ResponseEntity<Medication> removeIngredientFromMedication(
+            @PathVariable Long medicationId, 
+            @PathVariable Long ingredientId) {
+        try {
+            Medication updated = catalogService.removeIngredientFromMedication(medicationId, ingredientId);
+            return ResponseEntity.ok(updated);
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 }
