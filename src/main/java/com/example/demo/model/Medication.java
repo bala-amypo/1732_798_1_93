@@ -15,6 +15,17 @@ public class Medication {
     @Column(nullable = false)
     private String name;
     
+    @Column(name = "generic_name")
+    private String genericName;
+    
+    @Column(length = 1000)
+    private String description;
+    
+    @Column(name = "dosage_form")
+    private String dosageForm;
+    
+    private String strength;
+    
     @ManyToMany
     @JoinTable(
         name = "medication_ingredients",
@@ -47,6 +58,18 @@ public class Medication {
     
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
+    
+    public String getGenericName() { return genericName; }
+    public void setGenericName(String genericName) { this.genericName = genericName; }
+    
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
+    
+    public String getDosageForm() { return dosageForm; }
+    public void setDosageForm(String dosageForm) { this.dosageForm = dosageForm; }
+    
+    public String getStrength() { return strength; }
+    public void setStrength(String strength) { this.strength = strength; }
     
     public Set<ActiveIngredient> getIngredients() { return ingredients; }
     public void setIngredients(Set<ActiveIngredient> ingredients) { this.ingredients = ingredients; }

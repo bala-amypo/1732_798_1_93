@@ -15,6 +15,12 @@ public class ActiveIngredient {
     @Column(unique = true, nullable = false)
     private String name;
     
+    @Column(name = "chemical_name")
+    private String chemicalName;
+    
+    @Column(length = 1000)
+    private String description;
+    
     @ManyToMany(mappedBy = "ingredients")
     private Set<Medication> medications = new HashSet<>();
     
@@ -31,6 +37,12 @@ public class ActiveIngredient {
     
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
+    
+    public String getChemicalName() { return chemicalName; }
+    public void setChemicalName(String chemicalName) { this.chemicalName = chemicalName; }
+    
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
     
     public Set<Medication> getMedications() { return medications; }
     public void setMedications(Set<Medication> medications) { this.medications = medications; }
