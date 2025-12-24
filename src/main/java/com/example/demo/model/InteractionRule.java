@@ -43,18 +43,18 @@ public class InteractionRule {
     // Constructors
     public InteractionRule() {}
     
-    // Constructor for testing (4 parameters)
+    // IMPORTANT: Test expects this parameter order: ingredientA, ingredientB, severity, description
     public InteractionRule(ActiveIngredient ingredientA, ActiveIngredient ingredientB, 
-                          String severity, String description) {  // Changed parameter order
+                          String severity, String description) {
         this.ingredientA = ingredientA;
         this.ingredientB = ingredientB;
-        setSeverity(severity);  // Use setter for validation
+        setSeverity(severity);  // Use setter to validate
         this.description = description != null ? description : "";
         this.interactionType = "";
         this.recommendation = "";
     }
     
-    // Constructor for testing (6 parameters)  
+    // Constructor for 6 parameters - maintain same order for severity and description
     public InteractionRule(ActiveIngredient ingredientA, ActiveIngredient ingredientB, 
                           String severity, String description, String interactionType, String recommendation) {
         this.ingredientA = ingredientA;

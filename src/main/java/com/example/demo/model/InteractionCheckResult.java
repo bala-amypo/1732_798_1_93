@@ -18,11 +18,11 @@ public class InteractionCheckResult {
     private String interactions;
     
     @Column(name = "checked_at", nullable = false)
-    private LocalDateTime checkedAt;
+    private LocalDateTime checkedAt = LocalDateTime.now();  // Initialize here
     
     // Constructors
     public InteractionCheckResult() {
-        this.checkedAt = LocalDateTime.now();  // Set default in no-arg constructor
+        this.checkedAt = LocalDateTime.now();  // Also set in constructor
     }
     
     public InteractionCheckResult(String medications, String interactions) {
@@ -65,6 +65,9 @@ public class InteractionCheckResult {
     }
     
     public LocalDateTime getCheckedAt() {
+        if (checkedAt == null) {
+            checkedAt = LocalDateTime.now();  // Lazy initialization if null
+        }
         return checkedAt;
     }
     
