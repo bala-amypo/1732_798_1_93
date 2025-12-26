@@ -14,11 +14,13 @@ public class InteractionRule {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
-    @ManyToOne
+    // ADD CASCADE HERE - This is CRITICAL
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = "ingredient_a_id", nullable = false)
     private ActiveIngredient ingredientA;
     
-    @ManyToOne
+    // ADD CASCADE HERE - This is CRITICAL
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = "ingredient_b_id", nullable = false)
     private ActiveIngredient ingredientB;
     
@@ -26,7 +28,7 @@ public class InteractionRule {
     private String interactionType;
     
     @Column(name = "severity", nullable = false)
-    private String severity;  // Should be "MINOR", "MODERATE", "MAJOR"
+    private String severity;
     
     @Column(name = "description", length = 1000)
     private String description;
@@ -34,27 +36,32 @@ public class InteractionRule {
     @Column(name = "recommendation", length = 1000)
     private String recommendation;
     
+    // ADD THIS FIELD - Required by database
+    @Column(name = "active", nullable = false)
+    private Boolean active = true;
+    
     @Column(name = "medication1_id")
     private Long medication1Id;
     
     @Column(name = "medication2_id")
     private Long medication2Id;
     
-    // Constructors
-    public InteractionRule() {}
+    // Constructors - UPDATED to include active field
+    public InteractionRule() {
+        this.active = true;
+    }
     
-    // IMPORTANT: Test expects this parameter order: ingredientA, ingredientB, severity, description
     public InteractionRule(ActiveIngredient ingredientA, ActiveIngredient ingredientB, 
                           String severity, String description) {
         this.ingredientA = ingredientA;
         this.ingredientB = ingredientB;
-        setSeverity(severity);  // Use setter to validate
+        setSeverity(severity);
         this.description = description != null ? description : "";
         this.interactionType = "";
         this.recommendation = "";
+        this.active = true;  // ADD THIS
     }
     
-    // Constructor for 6 parameters - maintain same order for severity and description
     public InteractionRule(ActiveIngredient ingredientA, ActiveIngredient ingredientB, 
                           String severity, String description, String interactionType, String recommendation) {
         this.ingredientA = ingredientA;
@@ -63,9 +70,10 @@ public class InteractionRule {
         this.description = description != null ? description : "";
         this.interactionType = interactionType != null ? interactionType : "";
         this.recommendation = recommendation != null ? recommendation : "";
+        this.active = true;  // ADD THIS
     }
     
-    // Getters and Setters
+    // Getters and Setters - ADD active getter/setter
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     
@@ -101,6 +109,10 @@ public class InteractionRule {
     
     public String getRecommendation() { return recommendation; }
     public void setRecommendation(String recommendation) { this.recommendation = recommendation; }
+    
+    // ADD THIS GETTER AND SETTER
+    public Boolean getActive() { return active; }
+    public void setActive(Boolean active) { this.active = active; }
     
     @Override
     public boolean equals(Object o) {
