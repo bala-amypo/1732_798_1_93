@@ -113,3 +113,7 @@ public class SecurityConfig {
         return authenticationConfiguration.getAuthenticationManager();
     }
 }
+
+
+cd /home/coder/Workspace/demo
+find . -name "*.java" -type f -exec grep -l "allowedOrigins\|allowedOriginPatterns\|@CrossOrigin\|CorsConfiguration" {} \;
