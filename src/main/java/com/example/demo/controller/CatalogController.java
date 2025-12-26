@@ -12,7 +12,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/catalog")
-// @CrossOrigin(origins = "*")
+@CrossOrigin(origins = "*")
 public class CatalogController {
     
     @Autowired
