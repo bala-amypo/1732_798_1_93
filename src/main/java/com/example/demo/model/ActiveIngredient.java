@@ -1,5 +1,6 @@
 package com.example.demo.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
@@ -22,6 +23,7 @@ public class ActiveIngredient {
     private String description;
     
     @ManyToMany(mappedBy = "ingredients")
+    @JsonIgnore  // ← ADD THIS LINE
     private Set<Medication> medications = new HashSet<>();
     
     // Constructors
