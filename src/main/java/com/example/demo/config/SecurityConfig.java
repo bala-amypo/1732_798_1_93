@@ -57,7 +57,7 @@ public class SecurityConfig {
                 // Allow GET requests to catalog without auth (if needed)
                 .requestMatchers("/api/catalog/**").permitAll()
                 .requestMatchers("/api/medications/**").permitAll()
-                .requestMatchers("/api/ingredients/**").permitAll()
+                .requestMatchers("/api/ingredients/*").permitAll()
                 // All other requests require authentication
                 .anyRequest().authenticated()
             )
