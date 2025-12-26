@@ -2,6 +2,7 @@
 
 // import org.springframework.context.annotation.Bean;
 // import org.springframework.context.annotation.Configuration;
+// import org.springframework.http.HttpMethod;
 // import org.springframework.security.authentication.AuthenticationManager;
 // import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 // import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -50,10 +51,10 @@
 //                     // Actuator (if you use it)
 //                     "/actuator/**",
 //                     // Public API endpoints (if any)
-//                     "/api/test/**",
-//                     // Allow OPTIONS requests for CORS
-//                     "/**/options"
+//                     "/api/test/**"
 //                 ).permitAll()
+//                 // Allow OPTIONS requests for CORS preflight
+//                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 //                 // Allow GET requests to catalog without auth (if needed)
 //                 .requestMatchers("/api/catalog/**").permitAll()
 //                 .requestMatchers("/api/medications/**").permitAll()
@@ -167,14 +168,16 @@ public class SecurityConfig {
                     // Actuator (if you use it)
                     "/actuator/**",
                     // Public API endpoints (if any)
-                    "/api/test/**"
+                    "/api/test/**",
+                    // Catalog endpoints - public
+                    "/api/catalog/**",
+                    "/api/medications/**",
+                    "/api/ingredients/**",
+                    // Rules endpoint - ADDED THIS LINE
+                    "/api/rules/**"
                 ).permitAll()
                 // Allow OPTIONS requests for CORS preflight
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                // Allow GET requests to catalog without auth (if needed)
-                .requestMatchers("/api/catalog/**").permitAll()
-                .requestMatchers("/api/medications/**").permitAll()
-                .requestMatchers("/api/ingredients/**").permitAll()
                 // All other requests require authentication
                 .anyRequest().authenticated()
             )
@@ -193,7 +196,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        // FIX: Use allowedOriginPatterns instead of allowedOrigins
+        // Use allowedOriginPatterns instead of allowedOrigins
         configuration.setAllowedOriginPatterns(List.of("*"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         configuration.setAllowedHeaders(Arrays.asList(
