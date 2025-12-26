@@ -103,11 +103,11 @@ public class Medication {
     
     private String strength;
     
-    // ADD THIS FIELD - Required by database
     @Column(name = "active", nullable = false)
-    private Boolean active = true;  // Default value
+    private Boolean active = true;
     
-    @ManyToMany
+    // ADD THIS: cascade = {CascadeType.PERSIST, CascadeType.MERGE}
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
         name = "medication_ingredients",
         joinColumns = @JoinColumn(name = "medication_id"),
@@ -117,12 +117,12 @@ public class Medication {
     
     // Constructors
     public Medication() {
-        this.active = true;  // Initialize in constructor
+        this.active = true;
     }
     
     public Medication(String name) {
         this.name = name;
-        this.active = true;  // Initialize in constructor
+        this.active = true;
     }
     
     // Helper methods
@@ -155,7 +155,6 @@ public class Medication {
     public String getStrength() { return strength; }
     public void setStrength(String strength) { this.strength = strength; }
     
-    // ADD GETTER AND SETTER for active field
     public Boolean getActive() { return active; }
     public void setActive(Boolean active) { this.active = active; }
     
