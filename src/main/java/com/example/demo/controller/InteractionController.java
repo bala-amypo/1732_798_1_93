@@ -13,7 +13,7 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api/catalog")
 @CrossOrigin(origins = "*")
-public class CatalogController {
+public class InteractionController {
     
     @Autowired
     private CatalogService catalogService;
